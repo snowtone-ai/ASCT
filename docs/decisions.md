@@ -46,22 +46,67 @@
 - Adoption reason: base_confidence × staleness_factor × source_factor × perishability_factor × historical_accuracy. All parameters in company YAML config. No hardcoding.
 - Future review condition: If real-world data shows multiplicative model is too aggressive, consider additive scoring.
 
-## D-006: Event Priority — Scheduled vs Emergency
+## D-006: Dual Time Horizon (Strategic + Emergency)
 - Date: 2026-05-12
 - Target: architecture
-- Decision: **Deferred to Phase 1 (CodeX)** — design gap identified at scaffold stage
-- Problem: Current architecture treats all events equally via EventIngestor. No distinction between:
-  - **定期更新 (Scheduled)**: reorder_trigger, daily inventory check → can wait, batch OK
-  - **緊急時 (Emergency)**: supply_disruption, weather_event → must preempt, immediate processing
-- Required design for Phase 1:
-  - Add `priority: "scheduled" | "emergency"` field to Event model
-  - RunComposer: emergency events skip queue and run immediately
-  - Scheduled events: triggered by Alembic-compatible cron-style job or API endpoint called by external scheduler
-  - Emergency escalation path: if confidence < min_threshold AND priority = "emergency" → human notification (log + flag, no auto-action)
-- Rejected: Single queue with no priority (current implicit design) — risk of emergency events waiting behind scheduled batch jobs
+- Decision: Two planning layers run in parallel over the same agent codebase
+- Adoption reason: Supply chain planning inherently operates on multiple time scales. Kinaxis RapidResponse's "concurrent planning" demonstrates that strategic and tactical planning must happen simultaneously, not sequentially. Blue Yonder's demand sensing shows real-time signal processing is essential for modern supply chains.
+- Design:
+  - **Strategic Layer** (scheduled, daily/weekly): DemandForecaster + InventoryOptimizer. Triggered by API endpoint or external scheduler. Low urgency — queued for review/batch.
+  - **Emergency Layer** (event-driven, real-time): All agents + CEO fast loop. Triggered when Signal confidence ≥ threshold. High urgency — immediate execution or human escalation.
+  - Event model: add `priority: "scheduled" | "emergency"` field
+  - RunComposer: emergency events bypass queue and execute immediately
+  - Escalation: if confidence < min_threshold AND priority = "emergency" → human notification (log + flag, no auto-action)
+- Reference examples:
+  - Kinaxis RapidResponse -- adopted: concurrent planning model (strategic + tactical simultaneously)
+  - Blue Yonder demand sensing -- adopted: real-time signal processing with AI agents as "Digital Colleagues"
+  - SAP IBP S&OP -- avoided: batch-only planning cycle too slow for emergency response
+- Rejected alternatives:
+  - Single queue with no priority: emergency events wait behind scheduled batch jobs (unsafe)
+  - Separate codebases per layer: violates DRY, doubles maintenance cost
+- Implementation: Phase 1 (Event model) + Phase 3 (agent trigger logic). CodeX implements.
 - Future review condition: If event volume exceeds 100/day, consider separate queues or async processing.
+
+## D-007: Ontology Taxonomy (Palantir-inspired)
+- Date: 2026-05-12
+- Target: architecture
+- Decision: 3 primitive types (Asset, Location, Event) + 2 derived types (Signal, Action)
+- Adoption reason: Palantir Foundry's ontology-first approach — "define what objects mean before touching data." Having formal object taxonomy prevents the data model from becoming an ad-hoc collection of tables. Every table maps to a known ontology type, every relationship is semantically meaningful.
+- Design:
+  - Primitives map to SQL: Asset → products/inventory, Location → companies/locations, Event → events table
+  - Signal types: SupplyGap, DemandSpike, RouteDisruption, InventoryAlert, SeasonalShift
+  - Action: the output of CEO Orchestrator, stored with full causal chain
+  - Every Signal carries confidence (0.0–1.0), every table carries source ("sensor"|"manual"|"api")
+- Reference examples:
+  - Palantir Foundry Ontology -- adopted: Objects with typed properties, Links between objects, Actions as first-class concept
+  - Palantir AIP (2024-2026) -- noted: Ontology as backbone for enterprise AI agents (validates our agent-per-object-type approach)
+  - Domain-Driven Design (Evans) -- adopted: Ubiquitous Language principle (our CONTEXT.md)
+- Rejected alternatives:
+  - Flat table design with no taxonomy: works initially but makes agent-to-data mapping ambiguous at scale
+  - Full graph ontology (RDF/OWL): excessive complexity for MVP; SQLAlchemy relationships are sufficient
+- Future review condition: If object types exceed 15, consider a formal ontology definition language.
+
+## D-008: Four Specialist Agents (not Three)
+- Date: 2026-05-12
+- Target: architecture
+- Decision: 4 Tier-1 agents: DemandForecaster, SupplyRiskAssessor, InventoryOptimizer, LogisticsPlanner
+- Adoption reason: Supply risk and logistics risk are fundamentally different domains. A factory fire at a supplier (supply risk) requires different analysis than a typhoon blocking a delivery route (logistics). Merging them violates Principle 4 (Intentional Conflict) by creating an agent with conflicting sub-objectives.
+- Design:
+  - DemandForecaster: min stockout_cost. Triggers: demand_spike, seasonal_change
+  - SupplyRiskAssessor: min supply_disruption_cost. Triggers: supply_disruption, weather_event
+  - InventoryOptimizer: min (stockout_cost + holding_cost). Triggers: inventory_alert, demand_spike
+  - LogisticsPlanner: min (transport_cost + delivery_risk). Triggers: route_disruption, reorder_trigger
+  - CEO Orchestrator (Tier 2): weighted scoring across all scenarios
+- Evaluated skeletons:
+  - Skeleton A (3 agents — merge SupplyRisk + Logistics): Simpler but supply disruption and route optimization require different data, different SQL queries, different escalation paths. Success rate: 78%.
+  - Skeleton B (4 agents — current): Clean separation of concerns. Each agent has single objective. Success rate: 90%.
+  - Skeleton C (5+ agents — add PricingAgent, QualityAgent): Over-engineering for MVP. Agents can be added later via plugin registry with zero code change. Success rate: 75%.
+- Selected: Skeleton B (4 agents).
+- Future review condition: Add new agents only when a new objective function is needed that existing agents cannot represent. Plugin registry makes addition zero-cost.
 
 ## Future Changes
 - Async agent execution if scale demands it (D-001 review condition)
 - React frontend if complex interactivity needed (D-002 review condition)
 - LLM-powered NL parser as paid feature (D-003 review condition)
+- Separate event queues if volume > 100/day (D-006 review condition)
+- Formal ontology language if types > 15 (D-007 review condition)

@@ -52,6 +52,145 @@ No agent acts on a signal below min_confidence threshold. Confidence degrades wi
 data staleness, manual entry, perishability, and historical error rate. It must be
 computed dynamically, not hardcoded.
 
+## Ontology Layer
+
+Design modeled on Palantir Foundry's ontology-first approach: define what objects
+mean before touching data.
+
+### Primitive Object Types (3)
+
+| Type | Definition | Examples |
+|---|---|---|
+| Asset | What exists | Inventory items, vehicles, equipment, personnel |
+| Location | Where it exists | Supplier, factory, warehouse, distribution center, store |
+| Event | What happened | Typhoon warning, SNS demand spike, supplier outage, traffic disruption |
+
+### Derived Types (2)
+
+**Signal** — a typed impact of an Event on the supply chain.
+Fields: `type, dimension, delta, target, duration, confidence (0.0–1.0)`
+
+| Signal Type | Meaning | Dimension |
+|---|---|---|
+| SupplyGap | Supply-side shortfall | volume or cost |
+| DemandSpike | Demand-side surge | demand |
+| RouteDisruption | Logistics path degradation | time or cost |
+| InventoryAlert | Stock level deviation from policy | quantity |
+| SeasonalShift | Predictable demand pattern change | demand |
+
+**Action** — a decision made by an agent in response to Signals.
+Fields: `type, target, quantity, rationale, triggered_by (causal chain reference)`
+
+Every Signal carries confidence (0.0–1.0), computed dynamically from data staleness,
+input method (sensor vs manual), product perishability, and historical error rate.
+
+## Supply Chain Flow
+
+```
+Material flow (left → right):
+  [Supplier] → [Factory] → [Warehouse/DC] → [Store] → [Customer]
+
+Information flow (right → left):
+  [Customer] → [Store] → [Warehouse/DC] → [Factory] → [Supplier]
+```
+
+The information propagation delay and distortion across this chain is the core
+problem ASCT solves. Analogous to Kinaxis RapidResponse's concurrent planning:
+all supply chain components are linked and updated in real-time, not sequentially.
+
+### External Variables (affect the chain from outside)
+
+Weather/natural disasters, SNS trends, traffic conditions, fuel prices,
+geopolitical risk, regulatory changes, local events (festivals, strikes)
+
+### Internal Variables (state of the chain itself)
+
+Current inventory by SKU, lead times, production capacity, worker shifts,
+equipment utilization, defect rates, warehouse utilization, transport routes/costs
+
+## Agent Tier Architecture
+
+Agents are organized in two tiers. Inspired by Blue Yonder's "Digital Colleagues"
+concept where specialized AI agents alert planners about supply chain anomalies,
+but ASCT goes further: agents don't just alert — they propose competing scenarios
+that a CEO orchestrator resolves.
+
+### Tier 1 — Specialist Agents (local optimization)
+
+Each agent has a single objective function and argues for it.
+Intentional conflict between agents is a design feature, not a bug.
+Conflict makes tradeoffs visible and quantifiable.
+
+| Agent | Objective | Triggers | Key Inputs |
+|---|---|---|---|
+| DemandForecaster | min stockout_cost | demand_spike, seasonal_change | sales_history, inventory, SNS, weather |
+| SupplyRiskAssessor | min supply_disruption_cost | supply_disruption, weather_event | supplier reliability, lead times, events |
+| InventoryOptimizer | min (stockout_cost + holding_cost) | inventory_alert, demand_spike | inventory, inventory_policy, signal queue |
+| LogisticsPlanner | min transport_cost + delivery_risk | route_disruption, reorder_trigger | routes, fuel prices, weather, traffic |
+
+Why 4 agents, not 3: SupplyRiskAssessor and LogisticsPlanner handle fundamentally
+different domains. A factory fire at a supplier (supply risk) requires different
+analysis than a typhoon blocking a delivery route (logistics). Merging them would
+create an agent with conflicting objectives, violating Principle 4.
+
+### Tier 2 — CEO Orchestrator (global optimization)
+
+Receives all specialist scenarios as a list. Scores using weighted objective +
+constraint check. Returns globally optimal action, or `None` (escalate to human)
+if all scenarios violate constraints.
+
+**Scenario Contract** (all Tier 1 agents must return this shape):
+
+```python
+{
+    "name":           str,    # agent name + action summary
+    "stockout_cost":  float,  # estimated opportunity loss (JPY)
+    "holding_cost":   float,  # estimated inventory carry cost (JPY)
+    "transport_cost": float,  # estimated logistics cost (JPY)
+    "total_cost":     float,  # sum of above
+    "confidence":     float,  # 0.0–1.0, dynamically computed
+}
+```
+
+**CEO Scoring Function**:
+```
+score = w_stockout × stockout_cost + w_holding × holding_cost + w_transport × transport_cost
+```
+
+Disqualify if: `confidence < min_confidence` OR `total_cost > max_budget` OR
+`transport_cost > max_transport_cost`. If all scenarios disqualified → return
+`None` and log for human review.
+
+Every CEO decision is logged with full causal chain:
+`Event → Signal → Agent scenarios considered → Action chosen → Reason`
+
+## Dual Time Horizon
+
+Two planning layers run in parallel over the same agent codebase, inspired by
+Kinaxis RapidResponse's concurrent planning where strategic and tactical planning
+happen simultaneously rather than sequentially.
+
+### Strategic Layer (scheduled)
+
+- **Purpose**: Demand forecasting, reorder planning, resource allocation
+- **Primary agents**: DemandForecaster, InventoryOptimizer
+- **Trigger**: Configurable schedule (daily/weekly batch via API endpoint)
+- **Action urgency**: Low — plans queued for review or batch execution
+- **Typical signals**: SeasonalShift, InventoryAlert (slow drift)
+
+### Emergency Layer (event-driven, real-time)
+
+- **Purpose**: Anomaly detection, immediate intervention, urgent reorder
+- **Primary agents**: All agents + CEO in fast loop
+- **Trigger**: Event-driven (Signal with confidence ≥ threshold)
+- **Action urgency**: High — immediate execution or human escalation
+- **Typical signals**: SupplyGap, DemandSpike, RouteDisruption (sudden)
+
+Both layers share the same agent codebase and scenario contract.
+The difference is trigger frequency and action urgency, not agent logic.
+If confidence < min_threshold AND priority = emergency → human notification
+(log + flag, no autonomous action).
+
 ## Target Users
 
 - Non-technical supply chain managers (Japanese-speaking)

@@ -7,18 +7,30 @@ company:
   currency: "JPY"
 
 # CEO Orchestrator scoring weights (must sum to 1.0)
+# Maps to scenario contract: score = w_stockout × stockout_cost + w_holding × holding_cost + w_transport × transport_cost
 weights:
-  stockout_cost: 0.35
-  holding_cost: 0.25
-  transport_cost: 0.20
-  supply_risk: 0.20
+  stockout: 0.45
+  holding: 0.25
+  transport: 0.30
 
-# Business constraints
+# Business constraints (CEO disqualification thresholds)
 constraints:
+  min_confidence: 0.60
+  max_budget_jpy: 50000000
+  max_transport_cost_jpy: 15000000
+  max_stockout_rate: 0.05
   min_stock_days: 3
   max_lead_time_hours: 48
-  monthly_budget_jpy: 50000000
   max_order_quantity_multiplier: 2.5
+
+# Dual time horizon scheduling
+scheduling:
+  strategic:
+    interval: "daily"
+    agents: ["DemandForecaster", "InventoryOptimizer"]
+  emergency:
+    confidence_threshold: 0.60
+    agents: ["DemandForecaster", "SupplyRiskAssessor", "InventoryOptimizer", "LogisticsPlanner"]
 
 # Confidence score parameters
 confidence:

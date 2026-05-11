@@ -72,21 +72,37 @@ ASCT/
 
 ## Execution Flow
 
+### Strategic Layer (scheduled — daily/weekly)
 ```
-Event Ingestor (API / schedule)
-  → RunComposer (event type → agent selection via TRIGGERS)
-    → Agent A, B, C... (sync execution, each returns Scenario[])
+API/Scheduler trigger
+  → RunComposer (select: DemandForecaster, InventoryOptimizer)
+    → Agents execute sync, each returns Scenario[]
       → CEOOrchestrator (weighted scoring → optimal action)
-        → DB Write (decision + causal chain log)
+        → DB Write (decision + causal chain, priority=scheduled)
+```
+
+### Emergency Layer (event-driven — real-time)
+```
+Event Ingestor (API / external signal)
+  → RunComposer (event type → all relevant agents via TRIGGERS)
+    → All agents execute sync, each returns Scenario[]
+      → CEOOrchestrator (weighted scoring → optimal action)
+        → if confidence ≥ threshold: DB Write + auto-execute
+        → if confidence < threshold: DB Write + human escalation
 ```
 
 ## Key Patterns
 
 | Pattern | Location | Description |
 |---|---|---|
+| Ontology Layer | `src/models/` | 3 primitives (Asset, Location, Event) + 2 derived (Signal, Action) — Palantir-inspired |
 | Plugin Registry | `src/agents/__init__.py` | Auto-discovers `*.py` in agents/ directory |
 | BaseAgent ABC | `src/agents/base.py` | All agents implement `evaluate(context) -> list[Scenario]` |
 | TRIGGERS | Each agent class | Class attribute declaring which event types activate the agent |
+| Scenario Contract | Agent → CEO | `{name, stockout_cost, holding_cost, transport_cost, total_cost, confidence}` |
+| Agent Tiers | `src/agents/`, `src/orchestrator/` | Tier 1: 4 specialists (local opt), Tier 2: CEO (global opt) |
+| Dual Time Horizon | `configs/*.yaml` scheduling | Strategic (daily/weekly batch) + Emergency (event-driven real-time) |
+| Signal Types | `src/models/event.py` | SupplyGap, DemandSpike, RouteDisruption, InventoryAlert, SeasonalShift |
 | TypedSignal | `src/models/event.py` | Typed data point with dimension, target, delta, confidence |
 | CausalChain | `src/models/decision.py` | Full trace: Event → Signal → Scenario → Decision |
 | Config-Driven | `configs/*.yaml` | All business rules externalized; logic reads config, never hardcodes |
@@ -107,8 +123,9 @@ python -m src.seed.generate      # Generate seed data
 ## Config Structure
 
 Each company YAML in `configs/` contains:
-- `weights`: Agent scoring weights (must sum to 1.0)
-- `constraints`: Min stock days, max lead time, budget limits
-- `confidence`: Staleness decay, source multipliers, thresholds
-- `inventory_policies`: Per-product reorder points and quantities
-- `locations` / `suppliers`: Company-specific entities
+- `weights`: CEO scoring weights — `stockout`, `holding`, `transport` (must sum to 1.0)
+- `constraints`: CEO disqualification thresholds — `min_confidence`, `max_budget_jpy`, `max_transport_cost_jpy`, `max_stockout_rate`, plus operational limits
+- `confidence`: Staleness decay, source multipliers, perishability factor, thresholds
+- `scheduling`: Dual time horizon — strategic (interval, agents) and emergency (threshold, agents)
+- `inventory_policies`: Per-product reorder points, quantities, spoilage rates
+- `locations` / `suppliers`: Company-specific entities with reliability scores
