@@ -46,6 +46,21 @@
 - Adoption reason: base_confidence × staleness_factor × source_factor × perishability_factor × historical_accuracy. All parameters in company YAML config. No hardcoding.
 - Future review condition: If real-world data shows multiplicative model is too aggressive, consider additive scoring.
 
+## D-006: Event Priority — Scheduled vs Emergency
+- Date: 2026-05-12
+- Target: architecture
+- Decision: **Deferred to Phase 1 (CodeX)** — design gap identified at scaffold stage
+- Problem: Current architecture treats all events equally via EventIngestor. No distinction between:
+  - **定期更新 (Scheduled)**: reorder_trigger, daily inventory check → can wait, batch OK
+  - **緊急時 (Emergency)**: supply_disruption, weather_event → must preempt, immediate processing
+- Required design for Phase 1:
+  - Add `priority: "scheduled" | "emergency"` field to Event model
+  - RunComposer: emergency events skip queue and run immediately
+  - Scheduled events: triggered by Alembic-compatible cron-style job or API endpoint called by external scheduler
+  - Emergency escalation path: if confidence < min_threshold AND priority = "emergency" → human notification (log + flag, no auto-action)
+- Rejected: Single queue with no priority (current implicit design) — risk of emergency events waiting behind scheduled batch jobs
+- Future review condition: If event volume exceeds 100/day, consider separate queues or async processing.
+
 ## Future Changes
 - Async agent execution if scale demands it (D-001 review condition)
 - React frontend if complex interactivity needed (D-002 review condition)
