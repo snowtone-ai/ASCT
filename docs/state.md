@@ -1,30 +1,34 @@
 # state.md
 
 ## Current
-- Branch: scaffold/pm-zero-v92
-- Current executor: Claude Code
-- Write lock: Claude Code
-- Last verified: -
-- Verification mode: -
+- Branch: develop
+- Current executor: (none — awaiting CodeX)
+- Write lock: (none — released)
+- Last verified: 2026-05-11
+- Verification mode: quick
 
 ## Done
 - [x] Phase 0: Fact Verification
 - [x] Phase 0.5: Self-Audit
-- [x] Phase 2: pm-zero file generation (scaffold)
+- [x] Phase 0 scaffold: pm-zero v9.2 file generation (22 files)
+- [x] ASCT-specific deliverables (REPO-GUIDE.md, pyproject.toml, configs, alembic.ini)
+- [x] Design records (vision.md, decisions.md, CONTEXT.md)
+- [x] Git: scaffold/pm-zero-v92 → main → develop branches created and pushed
+- [x] prompt.md content migrated and file removed
 
 ## Doing
-- [ ] Initial scaffold commit + push
+- (nothing — handoff to CodeX)
 
-## Next
-- [ ] Phase 1: Schema (SQL models + Alembic migrations)
-- [ ] Phase 2: Seed data generation
-- [ ] Phase 3a: DemandForecaster agent
-- [ ] Phase 3b: SupplyRiskAssessor agent
-- [ ] Phase 3c: InventoryOptimizer agent
-- [ ] Phase 3d: LogisticsPlanner agent
-- [ ] Phase 4: CEO Orchestrator
-- [ ] Phase 5: Config layer (YAML + NL parser)
-- [ ] Phase 6: Streamlit frontend
+## Next (CodeX implementation phases)
+- [ ] Phase 1: Schema (SQL models + Alembic migrations) → `feature/phase-1-schema`
+- [ ] Phase 2: Seed data generation → `feature/phase-2-seed`
+- [ ] Phase 3a: DemandForecaster agent → `feature/phase-3a-demand-forecaster`
+- [ ] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
+- [ ] Phase 3c: InventoryOptimizer agent → `feature/phase-3c-inventory-optimizer`
+- [ ] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
+- [ ] Phase 4: CEO Orchestrator + RunComposer → `feature/phase-4-ceo`
+- [ ] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
+- [ ] Phase 6: Streamlit frontend → `feature/phase-6-frontend`
 
 ## Blocked
 - (none)
