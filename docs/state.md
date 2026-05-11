@@ -4,7 +4,7 @@
 - Branch: develop
 - Current executor: (none — awaiting CodeX)
 - Write lock: (none — released)
-- Last verified: 2026-05-11
+- Last verified: 2026-05-12
 - Verification mode: quick
 
 ## Done
@@ -15,6 +15,9 @@
 - [x] Design records (vision.md, decisions.md, CONTEXT.md)
 - [x] Git: scaffold/pm-zero-v92 → main → develop branches created and pushed
 - [x] prompt.md content migrated and file removed
+- [x] Architecture enhancement: Ontology Layer, Dual Time Horizon, Agent Tier System, Signal Types
+- [x] Config consistency fix: weight keys aligned to scenario contract, CEO disqualification thresholds added
+- [x] Cross-document consistency verification (vision ↔ decisions ↔ CONTEXT ↔ configs ↔ REPO-GUIDE)
 
 ## Doing
 - (nothing — handoff to CodeX)
