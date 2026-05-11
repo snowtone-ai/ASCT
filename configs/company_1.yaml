@@ -1,0 +1,90 @@
+# Freshfield Foods — Food & Perishables Company
+# Company 1 of 2 in ASCT seed data
+
+company:
+  name: "Freshfield Foods"
+  industry: "food"
+  currency: "JPY"
+
+# CEO Orchestrator scoring weights (must sum to 1.0)
+weights:
+  stockout_cost: 0.35
+  holding_cost: 0.25
+  transport_cost: 0.20
+  supply_risk: 0.20
+
+# Business constraints
+constraints:
+  min_stock_days: 3
+  max_lead_time_hours: 48
+  monthly_budget_jpy: 50000000
+  max_order_quantity_multiplier: 2.5
+
+# Confidence score parameters
+confidence:
+  staleness_half_life_hours: 12       # Food data goes stale fast
+  source_multipliers:
+    sensor: 1.0
+    api: 0.85
+    manual: 0.65
+  perishability_factor: 0.90          # Perishable goods penalty
+  min_confidence_threshold: 0.60      # Below this, escalate to human
+  high_confidence_threshold: 0.85     # Above this, auto-execute allowed
+
+# Inventory policies per product type
+inventory_policies:
+  fresh_produce:
+    reorder_point_days: 2
+    reorder_quantity_days: 5
+    max_stock_days: 7
+    spoilage_rate_per_day: 0.05
+  dairy:
+    reorder_point_days: 3
+    reorder_quantity_days: 7
+    max_stock_days: 14
+    spoilage_rate_per_day: 0.02
+  frozen:
+    reorder_point_days: 5
+    reorder_quantity_days: 14
+    max_stock_days: 60
+    spoilage_rate_per_day: 0.001
+  dry_goods:
+    reorder_point_days: 7
+    reorder_quantity_days: 21
+    max_stock_days: 180
+    spoilage_rate_per_day: 0.0
+  beverages:
+    reorder_point_days: 4
+    reorder_quantity_days: 10
+    max_stock_days: 90
+    spoilage_rate_per_day: 0.0
+
+# Locations (3 per company in seed data)
+locations:
+  - name: "Tokyo Distribution Center"
+    type: "warehouse"
+    lat: 35.6762
+    lon: 139.6503
+  - name: "Osaka Cold Storage"
+    type: "warehouse"
+    lat: 34.6937
+    lon: 135.5023
+  - name: "Fukuoka Processing Plant"
+    type: "factory"
+    lat: 33.5904
+    lon: 130.4017
+
+# Suppliers
+suppliers:
+  - name: "Hokkaido Farms Co."
+    products: ["fresh_produce", "dairy"]
+    reliability_score: 0.92
+    lead_time_hours: 24
+  - name: "Kyushu Frozen Foods"
+    products: ["frozen"]
+    reliability_score: 0.88
+    lead_time_hours: 36
+  - name: "National Dry Goods Inc."
+    products: ["dry_goods", "beverages"]
+    reliability_score: 0.95
+    lead_time_hours: 48

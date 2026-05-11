@@ -1,0 +1,94 @@
+# NexTech Components — Electronics & Components Company
+# Company 2 of 2 in ASCT seed data
+
+company:
+  name: "NexTech Components"
+  industry: "electronics"
+  currency: "JPY"
+
+# CEO Orchestrator scoring weights (must sum to 1.0)
+weights:
+  stockout_cost: 0.30
+  holding_cost: 0.20
+  transport_cost: 0.15
+  supply_risk: 0.35              # Electronics supply chains are fragile
+
+# Business constraints
+constraints:
+  min_stock_days: 7
+  max_lead_time_hours: 168       # 7 days — global supply chain
+  monthly_budget_jpy: 120000000
+  max_order_quantity_multiplier: 3.0
+
+# Confidence score parameters
+confidence:
+  staleness_half_life_hours: 72  # Electronics data stays relevant longer
+  source_multipliers:
+    sensor: 1.0
+    api: 0.90
+    manual: 0.70
+  perishability_factor: 1.00     # No perishability for electronics
+  min_confidence_threshold: 0.55
+  high_confidence_threshold: 0.80
+
+# Inventory policies per product type
+inventory_policies:
+  semiconductors:
+    reorder_point_days: 14
+    reorder_quantity_days: 30
+    max_stock_days: 180
+    spoilage_rate_per_day: 0.0
+  passive_components:
+    reorder_point_days: 10
+    reorder_quantity_days: 21
+    max_stock_days: 365
+    spoilage_rate_per_day: 0.0
+  connectors:
+    reorder_point_days: 7
+    reorder_quantity_days: 14
+    max_stock_days: 365
+    spoilage_rate_per_day: 0.0
+  display_modules:
+    reorder_point_days: 10
+    reorder_quantity_days: 21
+    max_stock_days: 120
+    spoilage_rate_per_day: 0.0
+  battery_cells:
+    reorder_point_days: 7
+    reorder_quantity_days: 14
+    max_stock_days: 90
+    spoilage_rate_per_day: 0.001   # Slight degradation over time
+
+# Locations (3 per company in seed data)
+locations:
+  - name: "Yokohama Main Warehouse"
+    type: "warehouse"
+    lat: 35.4437
+    lon: 139.6380
+  - name: "Nagoya Assembly Plant"
+    type: "factory"
+    lat: 35.1815
+    lon: 136.9066
+  - name: "Shenzhen Procurement Office"
+    type: "office"
+    lat: 22.5431
+    lon: 114.0579
+
+# Suppliers
+suppliers:
+  - name: "Taiwan Semiconductor Partners"
+    products: ["semiconductors"]
+    reliability_score: 0.85
+    lead_time_hours: 120
+  - name: "Shenzhen Components Ltd."
+    products: ["passive_components", "connectors"]
+    reliability_score: 0.80
+    lead_time_hours: 96
+  - name: "Korea Display Corp."
+    products: ["display_modules"]
+    reliability_score: 0.88
+    lead_time_hours: 72
+  - name: "Domestic Battery Supply"
+    products: ["battery_cells"]
+    reliability_score: 0.93
+    lead_time_hours: 48
