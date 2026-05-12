@@ -15,7 +15,8 @@ ASCT/
 │   │   ├── product.py          # Product, Supplier
 │   │   ├── inventory.py        # Inventory, InventoryPolicy
 │   │   ├── event.py            # Event, Signal (TypedSignal)
-│   │   └── decision.py         # AgentDecision, CEODecision, CausalChain
+│   │   ├── decision.py         # AgentDecision, CEODecision, CausalChain
+│   │   └── escalation.py      # EscalationRecord (human-in-the-loop)
 │   ├── agents/                 # Pluggable agent modules
 │   │   ├── __init__.py         # PluginRegistry (auto-discovers agents)
 │   │   ├── base.py             # BaseAgent ABC: evaluate(context) -> list[Scenario]
@@ -26,7 +27,8 @@ ASCT/
 │   ├── orchestrator/           # Decision-making core
 │   │   ├── ceo.py              # CEOOrchestrator: score_scenario(), resolve_conflicts()
 │   │   ├── run_composer.py     # Event → Agent mapping via TRIGGERS
-│   │   └── confidence.py       # Config-driven confidence calculation
+│   │   ├── confidence.py       # Config-driven confidence calculation
+│   │   └── escalation.py      # Escalation trigger logic + Slack notifier
 │   ├── config/                 # Configuration management
 │   │   ├── loader.py           # YAML + DB config merge
 │   │   ├── validator.py        # Weight sum = 1.0, threshold ranges
@@ -36,7 +38,8 @@ ASCT/
 │   │   ├── routes_company.py   # Company onboarding
 │   │   ├── routes_decisions.py # Decision explorer
 │   │   ├── routes_events.py    # Event ingestion (triggers agent runs)
-│   │   └── routes_config.py    # Config management
+│   │   ├── routes_config.py    # Config management
+│   │   └── routes_escalations.py  # Escalation CRUD + pending polling
 │   └── seed/
 │       └── generate.py         # Seed data generator
 ├── configs/                    # Per-company YAML configurations
@@ -87,8 +90,10 @@ Event Ingestor (API / external signal)
   → RunComposer (event type → all relevant agents via TRIGGERS)
     → All agents execute sync, each returns Scenario[]
       → CEOOrchestrator (weighted scoring → optimal action)
-        → if confidence ≥ threshold: DB Write + auto-execute
-        → if confidence < threshold: DB Write + human escalation
+        → if best scenario passes constraints: Action (auto-execute)
+        → if ambiguous/no viable/low confidence: Escalation
+          → DB Write + Slack webhook (if configured) + dashboard alert
+          → Human resolves via UI → Action (source="human")
 ```
 
 ## Key Patterns
@@ -107,6 +112,8 @@ Event Ingestor (API / external signal)
 | CausalChain | `src/models/decision.py` | Full trace: Event → Signal → Scenario → Decision |
 | Config-Driven | `configs/*.yaml` | All business rules externalized; logic reads config, never hardcodes |
 | Confidence Formula | `src/orchestrator/confidence.py` | `base × staleness × source × perishability × historical_accuracy` |
+| Escalation | `src/orchestrator/escalation.py` | 3 triggers → DB record → Slack webhook (optional) → dashboard alert |
+| Cost-Filling Rule | All agents | Each agent fills all 3 cost fields: primary (specialty) + secondary (baseline/zero) |
 
 ## Commands
 
@@ -126,6 +133,7 @@ Each company YAML in `configs/` contains:
 - `weights`: CEO scoring weights — `stockout`, `holding`, `transport` (must sum to 1.0)
 - `constraints`: CEO disqualification thresholds — `min_confidence`, `max_budget_jpy`, `max_transport_cost_jpy`, `max_stockout_rate`, plus operational limits
 - `confidence`: Staleness decay, source multipliers, perishability factor, thresholds
+- `escalation`: Ambiguity threshold, auto-expire hours, optional Slack webhook URL
 - `scheduling`: Dual time horizon — strategic (interval, agents) and emergency (threshold, agents)
 - `inventory_policies`: Per-product reorder points, quantities, spoilage rates
 - `locations` / `suppliers`: Company-specific entities with reliability scores

@@ -32,6 +32,12 @@ scheduling:
     confidence_threshold: 0.60
     agents: ["DemandForecaster", "SupplyRiskAssessor", "InventoryOptimizer", "LogisticsPlanner"]
 
+# Escalation settings
+escalation:
+  ambiguity_threshold: 0.05         # Score diff below which top scenarios are "too close to call"
+  auto_expire_hours: 24             # Auto-expire unacknowledged escalations
+  slack_webhook_url: ""             # Optional: Slack Incoming Webhook URL for push notifications (leave empty to disable)
+
 # Confidence score parameters
 confidence:
   staleness_half_life_hours: 12       # Food data goes stale fast

@@ -104,6 +104,45 @@
 - Selected: Skeleton B (4 agents).
 - Future review condition: Add new agents only when a new objective function is needed that existing agents cannot represent. Plugin registry makes addition zero-cost.
 
+## D-009: Human Escalation Design
+- Date: 2026-05-12
+- Target: architecture
+- Decision: DB-backed escalation with API polling endpoint (no external notification service)
+- Adoption reason: Zero-cost constraint eliminates push notification services (Twilio, SendGrid). DB + REST API provides full escalation lifecycle while allowing external systems to poll. Streamlit dashboard displays pending escalations natively.
+- Design:
+  - **3 triggers**: low_confidence (signal below threshold + emergency), no_viable_action (all scenarios disqualified), ambiguous_recommendation (top scores within threshold)
+  - **State machine**: pending → acknowledged → resolved/overridden/auto_expired
+  - **Data model**: EscalationRecord with trigger_type, event_id, scenarios_considered, status, resolution, resolved_by
+  - **API**: `GET /api/escalations/pending` for external system integration
+  - **Fail-safe**: auto_expired escalations take no action; system never acts autonomously when uncertain
+- Evaluated skeletons:
+  - Skeleton A (log-only): No API, relies on dashboard viewing. Success rate: 80%.
+  - Skeleton B (DB + API polling): Zero-cost, extensible, external integration via polling. Success rate: 92%.
+  - Skeleton C (DB + webhook push): Requires external service configuration. Success rate: 75%.
+- Selected: Skeleton B (DB + API polling).
+- Reference examples:
+  - PagerDuty incident model -- adopted: escalation state machine (triggered → acknowledged → resolved)
+  - Palantir AIP human-in-the-loop -- adopted: AI proposes, human approves for high-stakes decisions
+- Rejected alternatives:
+  - Webhook push notifications: violates zero-cost constraint, adds external service dependency
+  - Email notifications: requires SMTP configuration, not self-contained
+- Future review condition: If response time SLA requires push notification, add optional webhook URL in company config.
+
+## D-010: Slack Notification for Escalations
+- Date: 2026-05-12
+- Target: notification
+- Decision: Optional Slack Incoming Webhook, configured per company
+- Adoption reason: Slack Incoming Webhooks are free (zero-cost maintained). Optional config field means system works without it. Push notification solves the "human must be watching dashboard" problem without adding mandatory external dependencies.
+- Design:
+  - Company config field: `escalation.slack_webhook_url` (empty string = disabled)
+  - On escalation creation: if URL configured, POST JSON payload with trigger_type, event summary, top scenarios, dashboard link
+  - On POST failure: log warning, continue silently (DB + dashboard still work)
+  - Message format: simple Slack Block Kit with severity color coding
+- Rejected alternatives:
+  - Slack Bot API: OAuth complexity, bot management overhead for MVP
+  - Multi-service abstraction (Slack + Teams + email): premature abstraction for single notification channel
+- Future review condition: If Teams/email notifications needed, extract notification interface and add adapters.
+
 ## Future Changes
 - Async agent execution if scale demands it (D-001 review condition)
 - React frontend if complex interactivity needed (D-002 review condition)

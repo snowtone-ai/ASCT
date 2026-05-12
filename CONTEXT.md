@@ -17,7 +17,7 @@ Primitive types:
 
 Derived types:
 - Signal: A typed impact of an Event on the supply chain. Fields: type, dimension, delta, target, duration, confidence (0.0–1.0).
-- Action: A decision made by an agent in response to Signals. Fields: type, target, quantity, rationale, triggered_by.
+- Action: A decision produced when CEO selects a Scenario (or human resolves an Escalation). Fields: type, target, quantity, rationale, triggered_by, source ("ceo"|"human").
 
 ## Signal Types
 - SupplyGap: Supply-side shortfall. Dimension: volume or cost. Example: SupplyGap(dimension="volume", delta=-0.10, target="SupplierA", confidence=0.95).
@@ -25,6 +25,11 @@ Derived types:
 - RouteDisruption: Logistics path degradation. Dimension: time or cost. Example: RouteDisruption(dimension="time", delta=+12.0, target="Tokyo-Osaka", confidence=0.70).
 - InventoryAlert: Stock level deviation from policy. Dimension: quantity. Example: InventoryAlert(dimension="quantity", delta=-50, target="dairy@Tokyo_DC", confidence=0.91).
 - SeasonalShift: Predictable demand pattern change. Dimension: demand. Example: SeasonalShift(dimension="demand", delta=+0.15, target="beverages", confidence=0.88).
+
+## Escalation Terms
+- EscalationRecord: DB record created when system cannot act autonomously. Contains trigger_type, event_id, scenarios_considered, status, resolution.
+- Escalation Triggers: low_confidence (signal below threshold + emergency), no_viable_action (all scenarios disqualified), ambiguous_recommendation (top scores too close).
+- Escalation States: pending → acknowledged → resolved (human picks scenario) | overridden (human enters custom action) | auto_expired (timeout, no action taken).
 
 ## Architecture Terms
 - CausalChain: The traceable path Event → Signal → Agent Scenario → CEO Decision.
@@ -39,10 +44,10 @@ Derived types:
 
 ## Agent Tier System
 Tier 1 — Specialist Agents (local optimization, single objective each):
-- DemandForecaster: Minimizes stockout_cost. Triggers: demand_spike, seasonal_change. Inputs: sales_history, inventory, SNS, weather.
-- SupplyRiskAssessor: Minimizes supply_disruption_cost. Triggers: supply_disruption, weather_event. Inputs: supplier reliability, lead times, event signals.
-- InventoryOptimizer: Minimizes (stockout_cost + holding_cost). Triggers: inventory_alert, demand_spike. Inputs: inventory, inventory_policy, signal queue.
-- LogisticsPlanner: Minimizes (transport_cost + delivery_risk). Triggers: route_disruption, reorder_trigger. Inputs: routes, fuel prices, weather, traffic.
+- DemandForecaster: Minimizes stockout_cost (primary: stockout, secondary: holding). Triggers: demand_spike, seasonal_change. Inputs: sales_history, inventory, SNS, weather.
+- SupplyRiskAssessor: Minimizes disruption impact on stockout_cost and transport_cost. Triggers: supply_disruption, weather_event. Inputs: supplier reliability, lead times, event signals.
+- InventoryOptimizer: Minimizes (stockout_cost + holding_cost), secondary: transport (reorder). Triggers: inventory_alert, demand_spike. Inputs: inventory, inventory_policy, signal queue.
+- LogisticsPlanner: Minimizes transport_cost (primary), secondary: stockout (delay-induced). Triggers: route_disruption, reorder_trigger. Inputs: routes, fuel prices, weather, traffic.
 
 Tier 2 — CEO Orchestrator (global optimization):
 - Receives list[Scenario] from all Tier 1 agents. Scores via weighted formula. Returns optimal action or None (human escalation).
@@ -76,6 +81,8 @@ Tier 2 — CEO Orchestrator (global optimization):
 - 因果チェーン (Causal Chain): Japanese term for CausalChain shown in UI.
 - 戦略レイヤー (Strategic Layer): Scheduled planning cycle.
 - 緊急レイヤー (Emergency Layer): Real-time event-driven response.
+- エスカレーション (Escalation): System escalation to human when autonomous action is unsafe.
+- 人間判断待ち (Pending Human Review): Escalation status awaiting human response.
 
 ## Update Rules
 - Add terms when a new domain concept appears 3+ times in conversation.

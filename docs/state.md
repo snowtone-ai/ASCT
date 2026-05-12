@@ -18,20 +18,22 @@
 - [x] Architecture enhancement: Ontology Layer, Dual Time Horizon, Agent Tier System, Signal Types
 - [x] Config consistency fix: weight keys aligned to scenario contract, CEO disqualification thresholds added
 - [x] Cross-document consistency verification (vision ↔ decisions ↔ CONTEXT ↔ configs ↔ REPO-GUIDE)
+- [x] Human escalation framework: 3 triggers, state machine, Slack webhook option (D-009, D-010)
+- [x] Cold review: fixed 5 contradictions (agent objectives vs scenario contract, Action lifecycle, cost-filling rule)
 
 ## Doing
 - (nothing — handoff to CodeX)
 
 ## Next (CodeX implementation phases)
-- [ ] Phase 1: Schema (SQL models + Alembic migrations) → `feature/phase-1-schema`
+- [ ] Phase 1: Schema (SQL models + Alembic migrations + Escalation model) → `feature/phase-1-schema`
 - [ ] Phase 2: Seed data generation → `feature/phase-2-seed`
 - [ ] Phase 3a: DemandForecaster agent → `feature/phase-3a-demand-forecaster`
 - [ ] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
 - [ ] Phase 3c: InventoryOptimizer agent → `feature/phase-3c-inventory-optimizer`
 - [ ] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
-- [ ] Phase 4: CEO Orchestrator + RunComposer → `feature/phase-4-ceo`
+- [ ] Phase 4: CEO Orchestrator + RunComposer + Escalation logic → `feature/phase-4-ceo`
 - [ ] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
-- [ ] Phase 6: Streamlit frontend → `feature/phase-6-frontend`
+- [ ] Phase 6: Streamlit frontend (including escalation dashboard) → `feature/phase-6-frontend`
 
 ## Blocked
 - (none)

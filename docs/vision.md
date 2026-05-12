@@ -121,12 +121,12 @@ Each agent has a single objective function and argues for it.
 Intentional conflict between agents is a design feature, not a bug.
 Conflict makes tradeoffs visible and quantifiable.
 
-| Agent | Objective | Triggers | Key Inputs |
-|---|---|---|---|
-| DemandForecaster | min stockout_cost | demand_spike, seasonal_change | sales_history, inventory, SNS, weather |
-| SupplyRiskAssessor | min supply_disruption_cost | supply_disruption, weather_event | supplier reliability, lead times, events |
-| InventoryOptimizer | min (stockout_cost + holding_cost) | inventory_alert, demand_spike | inventory, inventory_policy, signal queue |
-| LogisticsPlanner | min transport_cost + delivery_risk | route_disruption, reorder_trigger | routes, fuel prices, weather, traffic |
+| Agent | Objective | Primary Costs | Triggers | Key Inputs |
+|---|---|---|---|---|
+| DemandForecaster | min stockout_cost | stockout (primary), holding (secondary) | demand_spike, seasonal_change | sales_history, inventory, SNS, weather |
+| SupplyRiskAssessor | min disruption impact | stockout + transport (disruption spillover) | supply_disruption, weather_event | supplier reliability, lead times, events |
+| InventoryOptimizer | min (stockout_cost + holding_cost) | stockout + holding (primary), transport (reorder) | inventory_alert, demand_spike | inventory, inventory_policy, signal queue |
+| LogisticsPlanner | min transport_cost | transport (primary), stockout (delay-induced) | route_disruption, reorder_trigger | routes, fuel prices, weather, traffic |
 
 Why 4 agents, not 3: SupplyRiskAssessor and LogisticsPlanner handle fundamentally
 different domains. A factory fire at a supplier (supply risk) requires different
@@ -152,6 +152,11 @@ if all scenarios violate constraints.
 }
 ```
 
+**Cost-Filling Rule**: Every agent estimates all 3 cost fields. Primary costs
+(the agent's specialty) are computed with full analysis. Secondary costs use
+baseline estimates (current state projection) or zero if no impact. This
+ensures CEO can compare scenarios on equal footing across all dimensions.
+
 **CEO Scoring Function**:
 ```
 score = w_stockout × stockout_cost + w_holding × holding_cost + w_transport × transport_cost
@@ -161,7 +166,10 @@ Disqualify if: `confidence < min_confidence` OR `total_cost > max_budget` OR
 `transport_cost > max_transport_cost`. If all scenarios disqualified → return
 `None` and log for human review.
 
-Every CEO decision is logged with full causal chain:
+**Scenario → Action Lifecycle**: Agents produce Scenarios (proposals). CEO
+selects the best Scenario, which becomes an Action (decision). Human-resolved
+escalations also produce Actions with `source="human"`. Every Action is logged
+with full causal chain:
 `Event → Signal → Agent scenarios considered → Action chosen → Reason`
 
 ## Dual Time Horizon
@@ -190,6 +198,78 @@ Both layers share the same agent codebase and scenario contract.
 The difference is trigger frequency and action urgency, not agent logic.
 If confidence < min_threshold AND priority = emergency → human notification
 (log + flag, no autonomous action).
+
+## Human Escalation Framework
+
+ASCT is autonomous-first, but certain conditions require human judgment.
+The system must fail safe: when uncertain, escalate rather than act.
+
+### Escalation Triggers (3 types)
+
+| Trigger | Condition | Priority |
+|---|---|---|
+| `low_confidence` | Signal confidence < min_confidence AND event priority = emergency | high |
+| `no_viable_action` | CEO disqualifies all scenarios (constraint violations) | high |
+| `ambiguous_recommendation` | Top 2 scenario scores differ by less than `ambiguity_threshold` | medium |
+
+### Escalation Record
+
+Each escalation is a first-class object stored in the database:
+
+```python
+{
+    "id":                   int,
+    "created_at":           datetime,
+    "trigger_type":         str,      # "low_confidence" | "no_viable_action" | "ambiguous_recommendation"
+    "event_id":             int,      # FK to originating Event
+    "scenarios_considered": list,     # All scenarios CEO evaluated
+    "priority":             str,      # "high" | "medium"
+    "status":               str,      # "pending" | "acknowledged" | "resolved" | "overridden" | "auto_expired"
+    "resolution":           dict,     # Human's chosen action (null until resolved)
+    "resolved_by":          str,      # Human identifier (null until resolved)
+    "resolved_at":          datetime, # (null until resolved)
+}
+```
+
+### Escalation State Machine
+
+```
+pending → acknowledged → resolved     (human selects a scenario or custom action)
+                       → overridden    (human overrides with manual decision)
+        → auto_expired                 (no response within auto_acknowledge_hours)
+```
+
+- `auto_expired` escalations are logged but take no action (fail-safe).
+- Resolved/overridden escalations create an Action with `source="human"` in the
+  causal chain, maintaining full traceability.
+
+### Escalation in the Execution Flow
+
+```
+CEO evaluates all Scenario[]
+  → Best scenario passes constraints   → execute as Action
+  → Top 2 scores within threshold      → Escalation(trigger=ambiguous_recommendation)
+  → All scenarios fail constraints      → Escalation(trigger=no_viable_action)
+  → Confidence < threshold + emergency  → Escalation(trigger=low_confidence)
+```
+
+### Escalation Visibility
+
+- **Dashboard**: Pending escalations shown as alert cards with countdown timer
+- **API**: `GET /api/escalations/pending` for external system polling
+- **Decision Explorer**: Resolved escalations visible in causal chain with
+  human override annotation
+
+### Notification Strategy
+
+**Default (zero-cost)**: Streamlit dashboard shows pending escalations as alert
+cards. REST API `GET /api/escalations/pending` enables external system polling.
+
+**Optional Slack integration**: If `escalation.slack_webhook_url` is configured
+in company YAML, the system POSTs escalation alerts to Slack via Incoming
+Webhook (free, no bot token required). Message includes: trigger type, event
+summary, top scenarios with scores, and a link to the dashboard for resolution.
+If webhook is empty or POST fails, falls back silently to DB + dashboard only.
 
 ## Target Users
 
@@ -227,8 +307,8 @@ If confidence < min_threshold AND priority = emergency → human notification
 
 ## Checklist -- Phase 1: Ontology & Data Model
 
-- [ ] Define core object types: Asset, Location, Event, Signal, Action, Policy
-- [ ] Design SQL schema: inventory, inventory_policy, sales_history, products, suppliers, routes, events, agent_decisions
+- [ ] Define core object types: Asset, Location, Event, Signal, Action, Escalation, Policy
+- [ ] Design SQL schema: inventory, inventory_policy, sales_history, products, suppliers, routes, events, agent_decisions, escalations
 - [ ] Every table has: id, created_at, updated_at, source (source = "sensor" | "manual" | "api")
 - [ ] Define confidence calculation rules as separate config
 
@@ -246,8 +326,10 @@ For each agent specify:
 - [ ] score_scenario(scenario, config) — weighted scoring
 - [ ] Constraint checking (budget, stockout_rate, transport_cost, min_confidence)
 - [ ] Conflict resolution: receive all scenarios, return optimal action
-- [ ] Escalation: if all scenarios exceed constraints, return None + log
-- [ ] Decision log with full causal chain
+- [ ] Escalation: 3 triggers (low_confidence, no_viable_action, ambiguous_recommendation)
+- [ ] Escalation state machine: pending → acknowledged → resolved/overridden/auto_expired
+- [ ] Escalation API: GET /api/escalations/pending for external polling
+- [ ] Decision log with full causal chain (including human override annotation)
 
 ## Checklist -- Phase 4: Config Layer
 

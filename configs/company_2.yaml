@@ -32,6 +32,12 @@ scheduling:
     confidence_threshold: 0.55
     agents: ["DemandForecaster", "SupplyRiskAssessor", "InventoryOptimizer", "LogisticsPlanner"]
 
+# Escalation settings
+escalation:
+  ambiguity_threshold: 0.03         # Electronics: tighter threshold for supply-sensitive decisions
+  auto_expire_hours: 12             # Faster timeout for electronics (shorter lead time tolerance)
+  slack_webhook_url: ""             # Optional: Slack Incoming Webhook URL for push notifications (leave empty to disable)
+
 # Confidence score parameters
 confidence:
   staleness_half_life_hours: 72  # Electronics data stays relevant longer
