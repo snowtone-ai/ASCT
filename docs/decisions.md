@@ -143,6 +143,17 @@
   - Multi-service abstraction (Slack + Teams + email): premature abstraction for single notification channel
 - Future review condition: If Teams/email notifications needed, extract notification interface and add adapters.
 
+## D-011: Phase 1 Relational Schema Examples
+- Date: 2026-05-12
+- Target: DB
+- Decision: Implement SQLAlchemy ORM tables for the Phase 1 ontology with integer primary keys, explicit foreign keys, JSON scenario/action payloads, and shared provenance columns.
+- Grounding examples:
+  - Freshfield Foods demand spike: Company → Tokyo Distribution Center → dairy Product → Inventory/InventoryPolicy → demand_spike Event → DemandSpike Signal → AgentDecision/CEODecision.
+  - NexTech route disruption: Company → Yokohama Main Warehouse and Nagoya Assembly Plant Locations → Route → route_disruption Event → RouteDisruption Signal.
+  - Human escalation: emergency Event → multiple scenario JSON payloads → EscalationRecord with ambiguous_recommendation, pending status, optional resolution.
+- Adoption reason: Preserves ontology traceability (Event → Signal → Scenario → Action) while keeping Phase 1 limited to schema and migration only.
+- Future review condition: Add uniqueness constraints after seed data and API write paths reveal the natural keys.
+
 ## Future Changes
 - Async agent execution if scale demands it (D-001 review condition)
 - React frontend if complex interactivity needed (D-002 review condition)

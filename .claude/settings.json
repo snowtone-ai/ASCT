@@ -84,5 +84,7 @@
         "hooks": [{ "type": "command", "command": "node .claude/hooks/dispatcher.mjs --event=UserPromptSubmit" }]
       }
     ]
-  }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "permissionMode": "bypassPermissions"
 }

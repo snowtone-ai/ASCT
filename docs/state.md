@@ -1,11 +1,11 @@
 # state.md
 
 ## Current
-- Branch: develop
-- Current executor: (none — awaiting CodeX)
+- Branch: feature/phase-1-schema
+- Current executor: (none — Phase 1 PR opened)
 - Write lock: (none — released)
 - Last verified: 2026-05-12
-- Verification mode: quick
+- Verification mode: standard
 
 ## Done
 - [x] Phase 0: Fact Verification
@@ -20,12 +20,12 @@
 - [x] Cross-document consistency verification (vision ↔ decisions ↔ CONTEXT ↔ configs ↔ REPO-GUIDE)
 - [x] Human escalation framework: 3 triggers, state machine, Slack webhook option (D-009, D-010)
 - [x] Cold review: fixed 5 contradictions (agent objectives vs scenario contract, Action lifecycle, cost-filling rule)
+- [x] Phase 1: Schema (SQL models + Alembic migration + model tests) → `feature/phase-1-schema`
 
 ## Doing
-- (nothing — handoff to CodeX)
+- (nothing — Phase 1 PR opened)
 
 ## Next (CodeX implementation phases)
-- [ ] Phase 1: Schema (SQL models + Alembic migrations + Escalation model) → `feature/phase-1-schema`
 - [ ] Phase 2: Seed data generation → `feature/phase-2-seed`
 - [ ] Phase 3a: DemandForecaster agent → `feature/phase-3a-demand-forecaster`
 - [ ] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
