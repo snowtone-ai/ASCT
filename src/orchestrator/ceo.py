@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from src.models import CEODecision, Event
+from src.models import CEODecision, EscalationRecord, Event
 from src.orchestrator.escalation import create_escalation
 
 
@@ -12,7 +12,7 @@ class CEOOrchestrator:
 
     def resolve(
         self, scenarios: list[dict], event: Event, config: dict
-    ) -> CEODecision:
+    ) -> CEODecision | EscalationRecord:
         if should_escalate_low_confidence(scenarios, event, config):
             return create_escalation(
                 self.session, "low_confidence", event, scenarios, config
