@@ -2,8 +2,8 @@
 
 ## Current
 - Branch: feature/phase-1-schema
-- Current executor: CodeX
-- Write lock: CodeX
+- Current executor: (none — Phase 1 PR opened)
+- Write lock: (none — released)
 - Last verified: 2026-05-12
 - Verification mode: standard
 
@@ -23,7 +23,7 @@
 - [x] Phase 1: Schema (SQL models + Alembic migration + model tests) → `feature/phase-1-schema`
 
 ## Doing
-- Preparing Phase 1 PR to `develop`
+- (nothing — Phase 1 PR opened)
 
 ## Next (CodeX implementation phases)
 - [ ] Phase 2: Seed data generation → `feature/phase-2-seed`
