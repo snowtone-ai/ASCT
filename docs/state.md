@@ -1,7 +1,7 @@
 # state.md
 
 ## Current
-- Branch: feature/phase-3a-demand-forecaster
+- Branch: feature/phase-3b-supply-risk-assessor
 - Current executor: CodeX
 - Write lock: CodeX
 - Last verified: 2026-05-12
@@ -23,12 +23,12 @@
 - [x] Phase 1: Schema (SQL models + Alembic migration + model tests) → `feature/phase-1-schema`
 - [x] Phase 2: Seed data generation → `feature/phase-2-seed`
 - [x] Phase 3a: DemandForecaster agent → `feature/phase-3a-demand-forecaster`
+- [x] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
 
 ## Doing
-- Preparing Phase 3a PR to `develop`
+- Preparing Phase 3b PR to `develop`
 
 ## Next (CodeX implementation phases)
-- [ ] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
 - [ ] Phase 3c: InventoryOptimizer agent → `feature/phase-3c-inventory-optimizer`
 - [ ] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
 - [ ] Phase 4: CEO Orchestrator + RunComposer + Escalation logic → `feature/phase-4-ceo`
