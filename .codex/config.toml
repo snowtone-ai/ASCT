@@ -1,13 +1,8 @@
-model = "o3"
-model_reasoning_effort = "high"
-approval_policy = "full-auto"
-sandbox_mode = "workspace-write"
+model = "gpt-5.5"
+model_reasoning_effort = "medium"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+default_permissions = ":danger-no-sandbox"
 
 [features]
-codex_hooks = true
-
-[profiles.standard]
-model_reasoning_effort = "medium"
-
-[profiles.light]
-model_reasoning_effort = "low"
+hooks = true
