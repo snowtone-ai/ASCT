@@ -1,9 +1,9 @@
 # state.md
 
 ## Current
-- Branch: feature/phase-6-frontend
-- Current executor: CodeX
-- Write lock: CodeX
+- Branch: develop
+- Current executor: (none — all CODEX-PLAN phases complete)
+- Write lock: (none — released)
 - Last verified: 2026-05-12
 - Verification mode: standard
 
@@ -31,7 +31,7 @@
 - [x] Phase 6: Streamlit frontend (including escalation dashboard) → `feature/phase-6-frontend`
 
 ## Doing
-- Preparing Phase 6 PR to `develop`
+- (nothing — ready for Claude review)
 
 ## Next (CodeX implementation phases)
 - (all CODEX-PLAN phases complete)
