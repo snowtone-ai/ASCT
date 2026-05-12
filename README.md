@@ -165,3 +165,6 @@ All planned implementation phases are complete:
 - Phase 5: config layer and Japanese parser
 - Phase 6: API and Streamlit dashboard
 
+## License
+
+MIT
