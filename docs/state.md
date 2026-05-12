@@ -5,7 +5,7 @@
 - Current executor: (none — all CODEX-PLAN phases complete)
 - Write lock: (none — released)
 - Last verified: 2026-05-12
-- Verification mode: standard
+- Verification mode: quick
 
 ## Done
 - [x] Phase 0: Fact Verification
@@ -29,6 +29,7 @@
 - [x] Phase 4: CEO Orchestrator + RunComposer + Escalation logic → `feature/phase-4-ceo`
 - [x] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
 - [x] Phase 6: Streamlit frontend (including escalation dashboard) → `feature/phase-6-frontend`
+- [x] Repository update: added `LICENSE` (MIT) and updated `README.md`; pushed to `origin/develop` (2026-05-12)
 
 ## Doing
 - (nothing — ready for Claude review)
