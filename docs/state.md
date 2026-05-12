@@ -1,7 +1,7 @@
 # state.md
 
 ## Current
-- Branch: feature/phase-3c-inventory-optimizer
+- Branch: feature/phase-3d-logistics-planner
 - Current executor: CodeX
 - Write lock: CodeX
 - Last verified: 2026-05-12
@@ -25,12 +25,12 @@
 - [x] Phase 3a: DemandForecaster agent → `feature/phase-3a-demand-forecaster`
 - [x] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
 - [x] Phase 3c: InventoryOptimizer agent → `feature/phase-3c-inventory-optimizer`
+- [x] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
 
 ## Doing
-- Preparing Phase 3c PR to `develop`
+- Preparing Phase 3d PR to `develop`
 
 ## Next (CodeX implementation phases)
-- [ ] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
 - [ ] Phase 4: CEO Orchestrator + RunComposer + Escalation logic → `feature/phase-4-ceo`
 - [ ] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
 - [ ] Phase 6: Streamlit frontend (including escalation dashboard) → `feature/phase-6-frontend`
