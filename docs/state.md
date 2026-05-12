@@ -1,7 +1,7 @@
 # state.md
 
 ## Current
-- Branch: feature/phase-4-ceo
+- Branch: feature/phase-5-config
 - Current executor: CodeX
 - Write lock: CodeX
 - Last verified: 2026-05-12
@@ -27,12 +27,12 @@
 - [x] Phase 3c: InventoryOptimizer agent → `feature/phase-3c-inventory-optimizer`
 - [x] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
 - [x] Phase 4: CEO Orchestrator + RunComposer + Escalation logic → `feature/phase-4-ceo`
+- [x] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
 
 ## Doing
-- Preparing Phase 4 PR to `develop`
+- Preparing Phase 5 PR to `develop`
 
 ## Next (CodeX implementation phases)
-- [ ] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
 - [ ] Phase 6: Streamlit frontend (including escalation dashboard) → `feature/phase-6-frontend`
 
 ## Blocked
