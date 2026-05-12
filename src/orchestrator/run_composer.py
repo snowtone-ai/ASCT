@@ -20,9 +20,10 @@ class RunComposer:
         for agent in agents:
             scenarios.extend(agent.evaluate({"event": event, "config": config}))
         if not scenarios:
-            return create_escalation(
+            result = create_escalation(
                 self.session, "no_viable_action", event, scenarios, config
             )
-        result = self.ceo.resolve(scenarios, event, config)
+        else:
+            result = self.ceo.resolve(scenarios, event, config)
         self.session.commit()
         return result
