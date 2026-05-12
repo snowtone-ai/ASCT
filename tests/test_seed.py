@@ -1,10 +1,14 @@
 from sqlalchemy import create_engine, event
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
-from src.database import Base
+from src.database import Base, SessionLocal, engine
 from src.models import (
+    CEODecision,
     Company,
     Event,
+    EventPriority,
+    EventType,
     Inventory,
     InventoryPolicy,
     Location,
@@ -66,3 +70,48 @@ def test_inventory_quantities_are_non_negative():
     generate_seed(session)
 
     assert all(row.quantity >= 0 for row in session.query(Inventory).all())
+
+
+def test_app_engine_enforces_sqlite_foreign_keys():
+    Base.metadata.create_all(bind=engine)
+    with SessionLocal() as session:
+        session.add(
+            Event(
+                event_type=EventType.DEMAND_SPIKE,
+                description="Invalid company FK",
+                priority=EventPriority.EMERGENCY,
+                data={},
+                company_id=999999,
+            )
+        )
+        try:
+            try:
+                session.commit()
+            except IntegrityError:
+                session.rollback()
+            else:
+                raise AssertionError("SQLite foreign keys were not enforced")
+        finally:
+            Base.metadata.drop_all(bind=engine)
+
+
+def test_reseed_deletes_decision_children_before_events():
+    session = make_session()
+    generate_seed(session)
+    event_row = session.query(Event).first()
+    session.add(
+        CEODecision(
+            event=event_row,
+            all_scenarios=[],
+            selected_action={"type": "noop"},
+            score=0.0,
+            rationale="test",
+            causal_chain={"event_id": event_row.id},
+        )
+    )
+    session.commit()
+
+    generate_seed(session)
+
+    assert session.query(CEODecision).count() == 0
+    assert session.query(Event).count() == 12

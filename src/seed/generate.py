@@ -10,7 +10,10 @@ from sqlalchemy.orm import Session
 
 from src.database import Base, SessionLocal, engine
 from src.models import (
+    AgentDecision,
+    CEODecision,
     Company,
+    EscalationRecord,
     Event,
     EventPriority,
     EventType,
@@ -41,6 +44,9 @@ def load_configs(paths: tuple[Path, ...] = CONFIG_PATHS) -> list[dict[str, Any]]
 def reset_seed_data(session: Session) -> None:
     for model in (
         Signal,
+        AgentDecision,
+        CEODecision,
+        EscalationRecord,
         Event,
         SalesHistory,
         InventoryPolicy,
