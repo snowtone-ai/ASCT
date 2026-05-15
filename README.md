@@ -1,170 +1,184 @@
-# ASCT: Agentic Supply Chain Twin
+# ASCT — Agentic Supply Chain Twin
 
-ASCT is a zero-cost prototype of an agentic supply chain decision engine. It
-models companies, locations, products, inventory, events, signals, scenarios,
-CEO-level decisions, and human escalations in a traceable ontology-style system.
+> マルチエージェント AI がサプライチェーン意思決定を自律実行する、ゼロコストプロトタイプ
 
-The project is built to demonstrate a Palantir-inspired pattern: define the
-business objects first, connect them through typed relationships, then let
-specialist agents propose competing actions that an orchestrator resolves.
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/Tests-49%20passed-brightgreen)](#テスト)
+[![Ruff](https://img.shields.io/badge/Lint-Ruff-orange)](https://github.com/astral-sh/ruff)
+[![Stack](https://img.shields.io/badge/Stack-SQLite%20%7C%20FastAPI%20%7C%20Streamlit-lightgrey)](#技術スタック)
 
-## What It Does
+---
 
-- Creates a SQLite-backed supply chain twin for two sample companies.
-- Generates deterministic seed data for companies, locations, products,
-  suppliers, inventory policies, inventory, sales history, events, and signals.
-- Runs four specialist agents:
-  - `DemandForecaster`
-  - `SupplyRiskAssessor`
-  - `InventoryOptimizer`
-  - `LogisticsPlanner`
-- Scores scenarios through a `CEOOrchestrator`.
-- Escalates unsafe or ambiguous cases to a human review flow.
-- Exposes FastAPI endpoints and a Streamlit dashboard.
-- Keeps causal chains traceable from `Event` to `Signal` to `Scenario` to
-  `Decision` or `Escalation`.
+## なぜ ASCT か
 
-## Architecture
+従来のサプライチェーンシステムは「何が起きたか」を記録するだけで、「なぜその判断をしたか」を説明できない。
 
-```text
-Event
-  -> Signal
-  -> RunComposer
-  -> PluginRegistry
-  -> Specialist Agents
-  -> Scenario[]
-  -> CEOOrchestrator
-  -> CEODecision or EscalationRecord
+ASCT は Palantir Foundry のオントロジーファーストアプローチにインスパイアされ、**イベント → シグナル → シナリオ → CEO 決定** という因果チェーンをすべてのアクションに紐付ける。専門エージェントが競合シナリオを提案し、CEOOrchestrator が信頼度スコアで解決する。人間のエスカレーションが必要なケースは自動的にフラグを立てる。
+
+---
+
+## アーキテクチャ
+
+```
+外部イベント (需要急増・天候・供給途絶)
+        │
+        ▼
+   [ Event ]  ─────── 因果チェーンの起点
+        │
+        ▼
+   [ Signal ]  ─── 型付きインパクト (SupplyGap / DemandSpike / RouteDisruption ...)
+        │
+        ▼
+  [ RunComposer ]  ── イベント種別 → エージェント組み合わせを決定
+        │
+   ┌────┴────────────────────────────────┐
+   ▼          ▼            ▼            ▼
+DemandF.  SupplyRisk  InvOpt.    LogisticsP.
+(需要予測) (供給リスク) (在庫最適化) (物流計画)
+   └────────────────────┬───────────────┘
+                        │ Scenario[]
+                        ▼
+              [ CEOOrchestrator ]
+              ┌─────────┴─────────┐
+              ▼                   ▼
+        CEODecision        EscalationRecord
+        (自律実行)          (人間レビュー待ち)
 ```
 
-Core layers:
+---
 
-- `src/models/`: SQLAlchemy ontology and persistence models.
-- `src/agents/`: specialist agents that produce scenario proposals.
-- `src/orchestrator/`: conflict resolution, confidence, escalation, and run
-  composition.
-- `src/config/`: YAML config loading, validation, and Japanese rule parsing.
-- `src/seed/`: deterministic sample data generation.
-- `src/api/`: FastAPI route modules.
-- `src/dashboard.py`: Streamlit dashboard.
-- `configs/`: company-specific YAML business rules.
-- `tests/`: unit and integration tests.
+## 主な特徴
 
-## Ontology Model
+- **型付きシグナル** — エージェント間を流れるデータはすべて `dimension / delta / target / confidence` を持つ。生の数値は渡さない。
+- **完全な因果チェーン** — Event から Decision まで全ステップを DB に記録し、非技術者にも日本語で説明可能。
+- **プラグイン型エージェント** — `BaseAgent` を継承してディレクトリに置くだけで自動登録。既存コードの変更ゼロ。
+- **信頼度ゲーティング** — データ鮮度・手動入力・腐敗率から信頼スコアを動的計算。閾値未満は自動エスカレーション。
+- **日本語 NL 設定パーサー** — 「欠品リスクを最優先にして」などの自然文を YAML に変換。LLM 不使用・ゼロコスト。
+- **ゼロコストスタック** — SQLite / FastAPI / Streamlit / YAML のみ。クラウド課金なし。
 
-Primitive object types:
+---
 
-- `Asset`: represented by products, inventory, suppliers, and policies.
-- `Location`: represented by companies, warehouses, factories, offices, and
-  routes.
-- `Event`: represented by demand spikes, supply disruptions, route disruptions,
-  inventory alerts, weather events, seasonal changes, and reorder triggers.
-
-Derived object types:
-
-- `Signal`: typed impact from an event, with dimension, target, delta, duration,
-  and confidence.
-- `Action`: represented by CEO decisions or human-resolved escalations.
-
-## Requirements
-
-- Python 3.11+
-- SQLite
-- Node.js only for optional repository scripts
-
-Install dependencies:
+## クイックスタート
 
 ```bash
+# 1. 依存関係インストール
 pip install -e ".[dev]"
-```
 
-## Setup
-
-Apply migrations:
-
-```bash
+# 2. DB マイグレーション + シードデータ生成
 alembic upgrade head
-```
-
-Generate seed data:
-
-```bash
 python -m src.seed.generate
-```
 
-Run the API:
-
-```bash
+# 3. API サーバー起動
 uvicorn src.main:app --reload
 ```
 
-Run the dashboard:
+| サービス | URL |
+|---|---|
+| API (FastAPI) | http://127.0.0.1:8000 |
+| ヘルスチェック | http://127.0.0.1:8000/health |
+| Swagger UI | http://127.0.0.1:8000/docs |
+| ダッシュボード | http://127.0.0.1:8501 |
+
+Streamlit ダッシュボードを別途起動:
 
 ```bash
 streamlit run src/dashboard.py
 ```
 
-Useful URLs:
+---
 
-- API health: `http://127.0.0.1:8000/health`
-- Dashboard: `http://127.0.0.1:8501`
+## API 概要
 
-## API Overview
+| メソッド | エンドポイント | 説明 |
+|---|---|---|
+| `POST` | `/api/events` | イベントを作成しエージェントパイプラインを実行 |
+| `GET` | `/api/decisions` | CEO 決定一覧 |
+| `GET` | `/api/decisions/{id}` | 決定詳細 + 因果チェーン |
+| `GET` | `/api/escalations/pending` | 人間レビュー待ちエスカレーション |
+| `PUT` | `/api/escalations/{id}/resolve` | エスカレーション解決 |
+| `GET` | `/api/dashboard/status` | ダッシュボード集計データ |
+| `POST` | `/api/config/parse-nl` | 日本語設定文を YAML に変換 |
 
-- `POST /api/events`: create an event and run the agent pipeline.
-- `GET /api/decisions`: list CEO decisions.
-- `GET /api/decisions/{id}`: inspect a decision and causal chain.
-- `GET /api/escalations/pending`: list pending human escalations.
-- `PUT /api/escalations/{id}/resolve`: resolve an escalation.
-- `GET /api/dashboard/status`: dashboard summary data.
-- `GET /api/companies`: list companies.
-- `GET /api/config/{company_id}`: load company config.
-- `POST /api/config/parse-nl`: parse simple Japanese config instructions.
+---
 
-## Verification
+## ディレクトリ構成
 
-Run the standard quality checks:
-
-```bash
-ruff check src/ tests/
-pytest
-pyright src/
+```
+ASCT/
+├── src/
+│   ├── agents/          # プラグイン型専門エージェント (4体)
+│   ├── orchestrator/    # CEOOrchestrator・RunComposer・信頼度計算・エスカレーション
+│   ├── models/          # SQLAlchemy ORM (オントロジー層)
+│   ├── config/          # YAML ローダー・バリデーター・日本語 NL パーサー
+│   ├── api/             # FastAPI ルートモジュール
+│   ├── seed/            # 決定論的シードデータ生成
+│   └── dashboard.py     # Streamlit ダッシュボード
+├── configs/
+│   ├── company_1.yaml   # Freshfield Foods (食品・生鮮)
+│   └── company_2.yaml   # NexTech Components (電子部品)
+├── tests/               # pytest テストスイート (49 テスト)
+├── docs/                # 設計ドキュメント (vision / decisions / state)
+└── migrations/          # Alembic マイグレーション
 ```
 
-Current expected result:
+---
 
-- Ruff: no issues
-- Pytest: 49 passed
-- Pyright: 0 errors
+## テスト
 
-## Design Principles
+```bash
+# 静的解析 + 型検査 + テスト
+ruff check src/ tests/
+pyright src/
+pytest
+```
 
-- Typed signals over raw numbers.
-- Full causal chains for explainability.
-- External configuration for company-specific business rules.
-- Intentional conflict between specialist agents.
-- Confidence-gated decisions and human escalation when uncertain.
-- Zero-cost local stack using SQLite, FastAPI, Streamlit, and YAML.
+| チェック | 期待結果 |
+|---|---|
+| Ruff | 0 issues |
+| Pyright | 0 errors |
+| Pytest | 49 passed |
 
-## Example Company Configs
+---
 
-- `configs/company_1.yaml`: Freshfield Foods, food and perishables.
-- `configs/company_2.yaml`: NexTech Components, electronics and components.
+## オントロジーモデル
 
-Each config defines scoring weights, constraints, confidence rules, escalation
-settings, scheduling, inventory policies, locations, and suppliers.
+| 種別 | 型 | 説明 |
+|---|---|---|
+| プリミティブ | `Asset` | 在庫・車両・サプライヤー |
+| プリミティブ | `Location` | 倉庫・工場・配送センター |
+| プリミティブ | `Event` | 台風・需要急増・供給途絶 |
+| 派生 | `Signal` | イベントの型付きインパクト。`type / dimension / delta / target / confidence` を持つ |
+| 派生 | `Action` | CEO 決定またはヒト解決済みエスカレーション |
 
-## Project Status
+---
 
-All planned implementation phases are complete:
+## 技術スタック
 
-- Phase 1: schema and Alembic migration
-- Phase 2: seed data generation
-- Phase 3: four specialist agents
-- Phase 4: CEO orchestrator and escalation
-- Phase 5: config layer and Japanese parser
-- Phase 6: API and Streamlit dashboard
+| レイヤー | 採用技術 | 理由 |
+|---|---|---|
+| DB | SQLite + SQLAlchemy | ゼロセットアップ、外部キー強制 |
+| API | FastAPI | 高速・型安全・自動ドキュメント |
+| UI | Streamlit | Python のみ、最速のダッシュボード構築 |
+| 設定 | YAML + ルールベース NL | LLM 不使用でゼロコスト |
+| テスト | pytest + Ruff + Pyright | 静的+動的品質保証 |
+| マイグレーション | Alembic | スキーマ変更の追跡 |
 
-## License
+---
 
-MIT
+## 設計フェーズ
+
+| フェーズ | 内容 | 状態 |
+|---|---|---|
+| Phase 1 | スキーマ + Alembic マイグレーション | ✅ 完了 |
+| Phase 2 | シードデータ生成 | ✅ 完了 |
+| Phase 3 | 専門エージェント × 4 | ✅ 完了 |
+| Phase 4 | CEO オーケストレーター + エスカレーション | ✅ 完了 |
+| Phase 5 | 設定レイヤー + 日本語 NL パーサー | ✅ 完了 |
+| Phase 6 | FastAPI + Streamlit ダッシュボード | ✅ 完了 |
+
+---
+
+## ライセンス
+
+[MIT](LICENSE)
