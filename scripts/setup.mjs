@@ -1,16 +1,11 @@
 #!/usr/bin/env node
-import fs from 'node:fs/promises';
+import fs from 'node:fs/promises'
 
 const dirs = [
-  // pm-zero standard
   'docs',
-  'scripts/lib',
-  '.claude/hooks',
-  '.claude/skills',
-  '.codex/hooks',
+  'scripts',
   'screenshots',
   'logs',
-  // ASCT project structure
   'src',
   'src/models',
   'src/agents',
@@ -19,16 +14,12 @@ const dirs = [
   'src/api',
   'src/seed',
   'tests',
-  'tests/test_agents',
-  'tests/test_orchestrator',
-  'tests/test_api',
-  'tests/test_config',
   'configs',
-];
+]
 
 for (const dir of dirs) {
-  await fs.mkdir(dir, { recursive: true });
-  console.log(`created: ${dir}`);
+  await fs.mkdir(dir, { recursive: true })
+  console.log(`ready: ${dir}`)
 }
 
-console.log('pm-zero v9.2 + ASCT directory structure ready.');
+console.log('pm-zero v9.4 + ASCT directory structure ready.')

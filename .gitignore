@@ -48,5 +48,10 @@ Thumbs.db
 logs/*.log
 screenshots/*.png
 
+# Local agent state
+.claude/settings.local.json
+.claude/worktrees/
+.mcp.json
+
 # Alembic
 alembic/versions/__pycache__/

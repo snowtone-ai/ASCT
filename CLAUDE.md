@@ -1,27 +1,19 @@
-# Claude Code Adapter -- pm-zero v9.2
+# Claude Code Adapter -- pm-zero v9.4
 
 @AGENTS.md
 
 ## Claude-specific
-- Claude Code reads CLAUDE.md. Common rules: AGENTS.md is the single source.
-- Prioritize: planning, design, review, prose quality judgment.
-- Maintain separate branch from Codex CLI at all times.
-- Skill commands: read .claude/skills/index.md for the relevant section.
-- Auto-execute all file, git, build, test, lint operations immediately.
+- Claude Code reads CLAUDE.md. Common rules live in AGENTS.md.
+- Prioritize planning, design, review, and prose quality judgment.
+- Write implementation tasks to tasks.md.
+- Use docs/repo-map.md Summary for navigation; read detailed sections only when needed.
+- Auto-execute file, git, build, test, and lint operations according to global settings and project boundaries.
 
 ## Shell Policy
-- Primary: PowerShell for all project operations (git, pip, python, pytest, build, test, lint).
-- Use the same PowerShell environment for Windows path access and system-level tasks.
-- Default to PowerShell when either shell can accomplish the task.
-- Project paths use Windows paths with backslash (\) in PowerShell.
+- Primary: PowerShell for all project operations.
+- Project paths use Windows paths with backslash in PowerShell.
+- Node.js scripts run with node scripts/name.mjs.
 
-## Repository Navigation
-- Read REPO-GUIDE.md first on session start to understand project structure.
-- Update REPO-GUIDE.md when directory structure changes.
-
-## Optimized for
-- Claude Code CLI v2.1.101
-- Opus 4.6 model
-- VSCode on Windows
-- PowerShell terminal
-- bypassPermissions mode
+## Version Policy
+- Keep the user's currently configured Claude Code version.
+- Verify local version during Phase 0 when relevant.

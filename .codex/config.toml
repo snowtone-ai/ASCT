@@ -1,8 +1,0 @@
-model = "gpt-5.5"
-model_reasoning_effort = "medium"
-approval_policy = "never"
-sandbox_mode = "danger-full-access"
-default_permissions = ":danger-no-sandbox"
-
-[features]
-hooks = true

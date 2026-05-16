@@ -2,40 +2,15 @@
 
 ## Current
 - Branch: develop
-- Current executor: (none — all CODEX-PLAN phases complete)
-- Write lock: (none — released)
-- Last verified: 2026-05-12
+- Active task: none
+- Current executor: none
+- Write lock: none
+- Coordinator: Codex CLI
+- Latest verification pointer: tasks.md T001
 - Verification mode: quick
 
-## Done
-- [x] Phase 0: Fact Verification
-- [x] Phase 0.5: Self-Audit
-- [x] Phase 0 scaffold: pm-zero v9.2 file generation (22 files)
-- [x] ASCT-specific deliverables (REPO-GUIDE.md, pyproject.toml, configs, alembic.ini)
-- [x] Design records (vision.md, decisions.md, CONTEXT.md)
-- [x] Git: scaffold/pm-zero-v92 → main → develop branches created and pushed
-- [x] prompt.md content migrated and file removed
-- [x] Architecture enhancement: Ontology Layer, Dual Time Horizon, Agent Tier System, Signal Types
-- [x] Config consistency fix: weight keys aligned to scenario contract, CEO disqualification thresholds added
-- [x] Cross-document consistency verification (vision ↔ decisions ↔ CONTEXT ↔ configs ↔ REPO-GUIDE)
-- [x] Human escalation framework: 3 triggers, state machine, Slack webhook option (D-009, D-010)
-- [x] Cold review: fixed 5 contradictions (agent objectives vs scenario contract, Action lifecycle, cost-filling rule)
-- [x] Phase 1: Schema (SQL models + Alembic migration + model tests) → `feature/phase-1-schema`
-- [x] Phase 2: Seed data generation → `feature/phase-2-seed`
-- [x] Phase 3a: DemandForecaster agent → `feature/phase-3a-demand-forecaster`
-- [x] Phase 3b: SupplyRiskAssessor agent → `feature/phase-3b-supply-risk-assessor`
-- [x] Phase 3c: InventoryOptimizer agent → `feature/phase-3c-inventory-optimizer`
-- [x] Phase 3d: LogisticsPlanner agent → `feature/phase-3d-logistics-planner`
-- [x] Phase 4: CEO Orchestrator + RunComposer + Escalation logic → `feature/phase-4-ceo`
-- [x] Phase 5: Config layer (YAML + NL parser) → `feature/phase-5-config`
-- [x] Phase 6: Streamlit frontend (including escalation dashboard) → `feature/phase-6-frontend`
-- [x] Repository update: added `LICENSE` (MIT) and updated `README.md`; pushed to `origin/develop` (2026-05-12)
+## Current Blocker
+- None
 
-## Doing
-- (nothing — ready for Claude review)
-
-## Next (CodeX implementation phases)
-- (all CODEX-PLAN phases complete)
-
-## Blocked
-- (none)
+## Next
+- See tasks.md

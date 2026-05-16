@@ -160,3 +160,9 @@
 - LLM-powered NL parser as paid feature (D-003 review condition)
 - Separate event queues if volume > 100/day (D-006 review condition)
 - Formal ontology language if types > 15 (D-007 review condition)
+## D-009: pm-zero v9.4 Lean Task Ledger alignment
+
+- Date: 2026-05-16
+- Decision: Use AGENTS.md, CLAUDE.md, HANDOFF-JA.md, tasks.md, docs/state.md, docs/repo-map.md, docs/decisions.md, and docs/issues.md as the repository memory layer.
+- Rationale: pm-zero v9.4 assigns personal behavior, hooks, MCP, and model defaults to global config; this repo should keep only project facts and verification commands.
+- Consequence: Old project-local hook, MCP, Codex, and skill scaffolds are not required unless a future task records a concrete project-specific need.

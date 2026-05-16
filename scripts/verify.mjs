@@ -1,75 +1,60 @@
 #!/usr/bin/env node
-/**
- * scripts/verify.mjs -- pm-zero v9.2 unified verification entry point
- * Adapted for Python/FastAPI (ASCT project)
- */
-import { spawn } from 'node:child_process';
-import { readdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 
-const isWindows = process.platform === 'win32';
+const isWindows = process.platform === 'win32'
+const shell = isWindows ? 'powershell.exe' : true
 
-function run(cmd, args, label) {
+const requiredPaths = [
+  'AGENTS.md',
+  'CLAUDE.md',
+  'HANDOFF-JA.md',
+  'tasks.md',
+  'docs/vision.md',
+  'docs/state.md',
+  'docs/decisions.md',
+  'docs/issues.md',
+  'docs/repo-map.md',
+  '.claude/settings.json',
+]
+
+const commands = [
+  ['ruff', ['check', 'src/', 'tests/'], 'Lint'],
+  ['pyright', ['src/'], 'Typecheck'],
+  ['pytest', ['--tb=short', '-q'], 'Tests'],
+]
+
+function run(command, args, label) {
   return new Promise((resolve) => {
-    console.log(`\n--- ${label} ---`);
-    const proc = spawn(cmd, args, {
-      stdio: 'inherit',
-      shell: isWindows ? 'powershell.exe' : true,
-    });
-    proc.on('close', (code) => {
-      const status = code === 0 ? 'PASS' : 'FAIL';
-      console.log(`${label}: ${status} (exit ${code})`);
-      resolve({ label, code, pass: code === 0 });
-    });
-    proc.on('error', (err) => {
-      console.log(`${label}: ERROR - ${err.message}`);
-      resolve({ label, code: -1, pass: false });
-    });
-  });
+    console.log(`\n--- ${label} ---`)
+    const child = spawn(command, args, { stdio: 'inherit', shell })
+    child.on('close', (code) => resolve({ label, ok: code === 0, code }))
+    child.on('error', (error) => {
+      console.error(`${label}: ${error.message}`)
+      resolve({ label, ok: false, code: -1 })
+    })
+  })
 }
 
-async function main() {
-  const results = [];
+const results = []
 
-  // 1. Check directory structure
-  console.log('=== ASCT Verification ===\n');
-  const requiredDirs = ['src', 'src/models', 'src/agents', 'src/orchestrator', 'tests', 'configs', 'docs'];
-  for (const dir of requiredDirs) {
-    const exists = existsSync(dir);
-    console.log(`  ${exists ? 'OK' : 'MISSING'}: ${dir}`);
-    if (!exists) results.push({ label: `dir:${dir}`, code: 1, pass: false });
-  }
-
-  // 2. Adapter integrity check
-  const adapterFiles = ['.claude/settings.json', '.codex/config.toml', 'AGENTS.md', 'CLAUDE.md'];
-  for (const f of adapterFiles) {
-    const exists = existsSync(f);
-    console.log(`  ${exists ? 'OK' : 'MISSING'}: ${f}`);
-    if (!exists) results.push({ label: `file:${f}`, code: 1, pass: false });
-  }
-
-  // 3. Lint
-  results.push(await run('ruff', ['check', 'src/', 'tests/'], 'Lint (ruff)'));
-
-  // 4. Type check (optional, only if pyright installed)
-  results.push(await run('pyright', ['src/'], 'Typecheck (pyright)'));
-
-  // 5. Tests
-  results.push(await run('pytest', ['--tb=short', '-q'], 'Tests (pytest)'));
-
-  // 6. Summary
-  console.log('\n=== Summary ===');
-  const failures = results.filter((r) => !r.pass);
-  if (failures.length === 0) {
-    console.log('All checks passed.');
-    process.exit(0);
-  } else {
-    console.log(`${failures.length} check(s) failed:`);
-    for (const f of failures) {
-      console.log(`  FAIL: ${f.label}`);
-    }
-    process.exit(1);
-  }
+console.log('=== ASCT verification ===')
+for (const file of requiredPaths) {
+  const ok = existsSync(file)
+  console.log(`${ok ? 'OK' : 'MISSING'} ${file}`)
+  if (!ok) results.push({ label: `required:${file}`, ok: false, code: 1 })
 }
 
-main();
+for (const [command, args, label] of commands) {
+  results.push(await run(command, args, label))
+}
+
+const failed = results.filter((result) => !result.ok)
+if (failed.length > 0) {
+  for (const result of failed) {
+    console.error(`[verify] ${result.label} failed with exit ${result.code}`)
+  }
+  process.exit(1)
+}
+
+console.log('[verify] all checks passed')

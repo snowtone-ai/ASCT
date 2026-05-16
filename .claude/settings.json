@@ -1,90 +1,10 @@
 {
   "permissions": {
-    "allow": [
-      "Read",
-      "Write",
-      "Edit",
-      "MultiEdit",
-      "Glob",
-      "Grep",
-      "WebFetch",
-      "WebSearch",
-      "PowerShell(pnpm *)",
-      "PowerShell(npm *)",
-      "PowerShell(npx *)",
-      "PowerShell(node *)",
-      "PowerShell(git *)",
-      "PowerShell(gh *)",
-      "PowerShell(python *)",
-      "PowerShell(pip *)",
-      "PowerShell(pytest *)",
-      "PowerShell(ruff *)",
-      "PowerShell(pyright *)",
-      "PowerShell(uvicorn *)",
-      "PowerShell(alembic *)",
-      "PowerShell(streamlit *)",
-      "PowerShell(uv *)",
-      "PowerShell(mkdir *)",
-      "PowerShell(cp *)",
-      "PowerShell(mv *)",
-      "PowerShell(cat *)",
-      "PowerShell(ls *)",
-      "PowerShell(pwd)",
-      "PowerShell(which *)",
-      "PowerShell(echo *)",
-      "PowerShell(touch *)",
-      "PowerShell(head *)",
-      "PowerShell(tail *)",
-      "PowerShell(wc *)",
-      "PowerShell(sort *)",
-      "PowerShell(diff *)",
-      "PowerShell(rg *)",
-      "PowerShell(fd *)",
-      "PowerShell(curl *)",
-      "PowerShell(rtk *)",
-      "PowerShell(Get-ChildItem *)",
-      "PowerShell(New-Item *)",
-      "PowerShell(Copy-Item *)",
-      "PowerShell(Move-Item *)",
-      "PowerShell(Get-Content *)",
-      "PowerShell(Set-Location *)",
-      "PowerShell(Test-Path *)",
-      "mcp__context7__resolve-library-id",
-      "mcp__context7__query-docs",
-      "mcp__brave-search__brave_web_search"
-    ],
     "deny": [
-      "PowerShell(Remove-Item -Recurse -Force /)",
-      "PowerShell(git push --force *)",
-      "PowerShell(git push -f *)",
-      "PowerShell(git reset --hard *)",
-      "PowerShell(git clean -fd *)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(**/.env)",
       "Read(**/.env.*)"
     ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume|clear|compact",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/dispatcher.mjs --event=SessionStart" }]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/dispatcher.mjs --event=PostToolUseFailure" }]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/dispatcher.mjs --event=UserPromptSubmit" }]
-      }
-    ]
-  },
-  "skipDangerousModePermissionPrompt": true,
-  "permissionMode": "bypassPermissions"
+  }
 }
