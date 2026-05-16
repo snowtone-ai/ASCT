@@ -2,9 +2,6 @@
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 
-const isWindows = process.platform === 'win32'
-const shell = isWindows ? 'powershell.exe' : true
-
 const requiredPaths = [
   'AGENTS.md',
   'CLAUDE.md',
@@ -27,13 +24,19 @@ const commands = [
 function run(command, args, label) {
   return new Promise((resolve) => {
     console.log(`\n--- ${label} ---`)
-    const child = spawn(command, args, { stdio: 'inherit', shell })
+    const processSpec = createProcessSpec(command, args)
+    const child = spawn(processSpec.command, processSpec.args, { stdio: 'inherit', shell: false })
     child.on('close', (code) => resolve({ label, ok: code === 0, code }))
     child.on('error', (error) => {
       console.error(`${label}: ${error.message}`)
       resolve({ label, ok: false, code: -1 })
     })
   })
+}
+
+function createProcessSpec(command, args) {
+  if (process.platform !== 'win32') return { command, args }
+  return { command: 'cmd.exe', args: ['/d', '/s', '/c', command, ...args] }
 }
 
 const results = []

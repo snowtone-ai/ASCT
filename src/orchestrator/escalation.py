@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime
-
 import httpx
 from sqlalchemy.orm import Session
 
@@ -12,6 +10,7 @@ from src.models import (
     EscalationTrigger,
     Event,
 )
+from src.models.base import utc_now
 
 
 def create_escalation(
@@ -66,7 +65,7 @@ def resolve_escalation(
         raise ValueError(f"EscalationRecord not found: {escalation_id}")
     escalation.resolution = resolution
     escalation.resolved_by = resolved_by
-    escalation.resolved_at = datetime.utcnow()
+    escalation.resolved_at = utc_now()
     escalation.status = EscalationStatus.RESOLVED
     session.flush()
     return escalation

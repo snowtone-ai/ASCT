@@ -59,6 +59,7 @@ def reset_seed_data(session: Session) -> None:
     ):
         session.query(model).delete()
     session.commit()
+    session.expunge_all()
 
 
 def generate_seed(session: Session, configs: list[dict[str, Any]] | None = None) -> None:

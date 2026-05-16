@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 
 import pytest
 from sqlalchemy import create_engine, event
@@ -26,6 +26,7 @@ from src.models import (
     SignalType,
     Supplier,
 )
+from src.models.base import utc_now
 
 
 @pytest.fixture()
@@ -62,7 +63,7 @@ def build_graph(session):
         product=product,
         location=origin,
         quantity=100,
-        last_checked_at=datetime.utcnow(),
+        last_checked_at=utc_now(),
     )
     policy = InventoryPolicy(
         product=product,
