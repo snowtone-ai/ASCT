@@ -38,7 +38,15 @@ PRODUCT_UNITS = {
 
 
 def load_configs(paths: tuple[Path, ...] = CONFIG_PATHS) -> list[dict[str, Any]]:
-    return [yaml.safe_load(path.read_text(encoding="utf-8")) for path in paths]
+    return [load_config(path) for path in paths]
+
+
+def load_config(path: Path) -> dict[str, Any]:
+    config = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(config, dict):
+        msg = f"Seed config must be a mapping: {path}"
+        raise ValueError(msg)
+    return config
 
 
 def reset_seed_data(session: Session) -> None:
