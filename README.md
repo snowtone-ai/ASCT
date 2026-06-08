@@ -1,63 +1,75 @@
 # ASCT — Agentic Supply Chain Twin
 
+![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-teal?logo=fastapi)
+![Streamlit](https://img.shields.io/badge/Streamlit-dashboard-red?logo=streamlit)
+![SQLite](https://img.shields.io/badge/database-SQLite-lightblue?logo=sqlite)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
+
 > 調達・在庫・物流の意思決定を、4体のAIエージェントが自律的に処理するサプライチェーン管理プロトタイプ
 
-需要急増・天候・供給途絶などの外部イベントを検知し、複数の専門AIエージェントがシナリオを提案、CEOオーケストレーター（指揮役AI）が信頼スコアをもとに最終決定を下します。すべての判断経緯は記録され、人間によるレビューが必要なケースは自動でエスカレーション（上位者への回付）されます。
+需要急増・天候・供給途絶などの外部イベントを検知し、複数の専門エージェントがシナリオを提案、CEOオーケストレーターが信頼スコアをもとに最終決定を下す。すべての判断経緯はDBに記録され、信頼スコアが閾値を下回るケースは自動でエスカレーションされる。
+
+---
+
+## エージェント構成
+
+```
+外部イベント（需要急増・天候・供給途絶）
+    │
+    ▼
+CEO Orchestrator（信頼スコアで最終決定）
+    ├── DemandForecastAgent  — 需要予測・季節性補正
+    ├── SupplyRiskAgent      — 供給リスク評価
+    ├── InventoryOptAgent    — 在庫最適化シナリオ生成
+    └── LogisticsAgent       — 物流ルート提案
+    │
+    ▼
+Decision Log（SQLite）— 因果チェーン全記録
+    ├── 信頼スコア < 閾値 → 人間へエスカレーション
+    └── 閾値以上 → 自動実行
+```
 
 ---
 
 ## 主な機能
 
-- 需要予測・供給リスク・在庫最適化・物流計画の4つの専門エージェントが連携して意思決定シナリオを提案できる
-- イベントから最終決定までの因果チェーン（判断の根拠）を全ステップデータベースに記録・参照できる
-- 信頼スコアが閾値を下回るケースを自動検知して人間へのエスカレーションを発行できる
-- 「欠品リスクを最優先にして」などの日本語テキストをAIなしでシステム設定に変換できる
-- Streamlit（Pythonで作るウェブUI）ダッシュボードで意思決定状況を視覚的に確認できる
+- 4専門エージェントが連携して意思決定シナリオを提案
+- イベントから最終決定までの因果チェーンをすべてDBに記録
+- 信頼スコアが閾値を下回ると自動でエスカレーション
+- 日本語テキストをLLMなしでシステム設定に変換するルールエンジン
+- Streamlitダッシュボードでリアルタイム監視
 
 ---
 
 ## 技術スタック
 
-| カテゴリ | 技術・ツール |
+| カテゴリ | 技術 |
 |---|---|
-| バックエンド | FastAPI（Python製の高速APIフレームワーク）、SQLAlchemy（データベース操作ライブラリ）、Alembic（データベース構造の変更管理ツール） |
-| データベース | SQLite（外部サービス不要のファイル型データベース） |
-| インフラ・環境 | クラウドサービス不使用（ゼロコストのローカル環境で動作） |
-| AI・外部API | LLM（大規模言語モデル）不使用。ルールベースの自然言語パーサーを独自実装 |
+| バックエンド | FastAPI, SQLAlchemy, Alembic |
+| データベース | SQLite |
+| UI | Streamlit |
+| AI | LLMなし — 決定論的ルールエンジン |
 
 ---
 
 ## 設計の工夫
 
-- プラグイン型エージェント設計を採用しており、`BaseAgent`（基底クラス）を継承して所定ディレクトリに置くだけで新しいエージェントを追加できる
-- すべてのエージェント間データに「次元・変化量・対象・信頼度」を付与した型付きシグナル形式を採用し、判断根拠の追跡を可能にしている
-- SQLite・FastAPI・Streamlit・YAMLのみで構成されたゼロコストスタック（クラウド課金なし）
+- `BaseAgent` を継承して所定ディレクトリに配置するだけで新エージェントを追加できるプラグイン設計
+- エージェント間データに「次元・変化量・対象・信頼度」を付与した型付きシグナル形式で判断根拠を追跡可能
+- クラウドサービス不使用。SQLite + FastAPI + Streamlit + YAML のみで動作
 
 ---
 
 ## セットアップ
 
-必要なツール：Python 3.11以上
-
 ```bash
-# 依存パッケージのインストール
 pip install -e ".[dev]"
-
-# データベースマイグレーションとシードデータ生成
 alembic upgrade head
 python -m src.seed.generate
-
-# APIサーバー起動
-uvicorn src.main:app --reload
-
-# ダッシュボード起動（別ターミナルで）
-streamlit run src/dashboard.py
+uvicorn src.main:app --reload       # API: http://127.0.0.1:8000/docs
+streamlit run src/dashboard.py      # UI:  http://127.0.0.1:8501
 ```
-
-| サービス | URL |
-|---|---|
-| API（Swagger UIドキュメント付き） | http://127.0.0.1:8000/docs |
-| ダッシュボード | http://127.0.0.1:8501 |
 
 ---
 
