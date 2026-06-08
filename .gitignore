@@ -55,3 +55,9 @@ screenshots/*.png
 
 # Alembic
 alembic/versions/__pycache__/
+
+# GCP service account keys
+service-account*.json
+credentials.json
+.claude/transcripts/
+.claude/cache/
