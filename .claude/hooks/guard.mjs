@@ -12,12 +12,11 @@ import { warnHookFailure } from '../../scripts/lib/redact.mjs';
 
 // Dangerous patterns covering both Bash and PowerShell invocations.
 const DENY = [
-  { re: /git\s+push\s+(--force|-f)\b/i, msg: 'Force-push is blocked. Use a standard push.' },
-  { re: /git\s+push\s+.*--force-with-lease/i, msg: 'Force-push is blocked.' },
+  { re: /git\s+push\s+(--force\b|--force-with-lease|-\w*f)/i, msg: 'Force-push is blocked. Use a standard push.' },
   { re: /git\s+reset\s+--hard/i, msg: 'git reset --hard is blocked (history is the audit trail).' },
-  { re: /git\s+clean\s+-[a-z]*f/i, msg: 'git clean -f is blocked.' },
-  { re: /\brm\s+-rf?\s+[\/~]/i, msg: 'Recursive delete of root/home is blocked.' },
-  { re: /Remove-Item\b.*-Recurse\b.*-Force\b.*[\\/~]\s*$/i, msg: 'Recursive force delete is blocked.' },
+  { re: /git\s+clean\s+-\w*f/i, msg: 'git clean -f is blocked.' },
+  { re: /\brm\s+-\w*r\w*f?\w*\s+[\/~]/i, msg: 'Recursive delete of root/home is blocked.' },
+  { re: /Remove-Item\b(?=.*-Recurse\b)(?=.*-Force\b).*(\s[\/~]|[A-Za-z]:\\)/i, msg: 'Recursive force delete of a root/drive path is blocked.' },
   { re: /\b(drop|truncate)\s+(table|database|schema)\b/i, msg: 'Destructive DB op requires an explicit logged decision.' },
   { re: /(cat|type|Get-Content|Read-Host)\b.*\.env(\.|\b)/i, msg: 'Reading .env / secrets is blocked.' },
 ];
