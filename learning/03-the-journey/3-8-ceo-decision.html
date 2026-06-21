@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3-8 CEOの最終判断 — ceo.py を読む</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>3-8 CEOの最終判断 — ceo.py を読む</h1>
+<blockquote><p>旅の終着点にして山場。各エージェントの打ち手を見比べ、最終決定を下す「社長」のロジック。</p><p>対象ファイル：<code>src/orchestrator/ceo.py</code>（全91行）</p></blockquote>
+<hr>
+<h2>🟣 このファイルの役割</h2>
+<p><strong>CEOオーケストレーター</strong>。エージェントが出した打ち手（シナリオ）を受け取り、 ①制約チェック → ②点数づけ → ③最終決定 を行います。 決めきれなければ <strong>エスカレーション</strong>（人間へ）。背骨⑥（→ <code>2-1</code>）。</p>
+<hr>
+<h2>🟢 心臓部：resolve メソッド（13〜30行目）</h2>
+<pre><span class="lang">python</span><code>def resolve(
+    self, scenarios: list[dict], event: Event, config: dict
+) -&gt; CEODecision | EscalationRecord:                          # 🔴 決定 か エスカレーション を返す（1-6で予習済）
+    if should_escalate_low_confidence(scenarios, event, config):  # 🔴① 緊急なのに自信不足なら…
+        return create_escalation(self.session, &quot;low_confidence&quot;, event, scenarios, config)  # 人間へ
+    viable = [s for s in scenarios if check_constraints(s, config)]  # 🔴② 制約を満たす案だけ残す
+    if not viable:                                            # 🔴③ 1つも残らなければ…
+        return create_escalation(self.session, &quot;no_viable_action&quot;, event, scenarios, config)  # 人間へ
+    ranked = sorted(viable, key=lambda item: score_scenario(item, config))  # 🔴④ 点数の低い順に並べる
+    if is_ambiguous(ranked, config):                          # 🔴⑤ 上位2案が僅差なら…
+        return create_escalation(self.session, &quot;ambiguous_recommendation&quot;, event, ranked[:2], config)  # 人間へ
+    return create_decision(self.session, ranked[0], scenarios, event, config)  # 🔴⑥ 最良案を採用！</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>この6ステップが ASCT の意思決定そのもの</strong>。<code>2-1</code> で予告した「3つのエスカレーション理由」が、 ①③⑤として実装されているのが見えます。</p>
+<hr>
+<h2>🔵 ステップを物語で</h2>
+<blockquote><p><strong>①「緊急なのに、全案の自信が低い」</strong> → 危ないので人間へ（<code>low_confidence</code>）。</p><p><strong>②「制約（予算・輸送費・最低信頼度）を満たす案だけ選別」</strong> — ふるい落とし。</p><p><strong>③「ふるいに全部落ちた」</strong> → 打てる手が無い。人間へ（<code>no_viable_action</code>）。</p><p><strong>④「残った案を、点数の低い順（＝コストが小さく望ましい順）に並べる」</strong></p><p><strong>⑤「1位と2位の点差が小さすぎる」</strong> → 甲乙つけ難い。人間へ（<code>ambiguous_recommendation</code>）。</p><p><strong>⑥「ここまで来たら、堂々の1位を採用」</strong> → CEODecision（決定）。</p></blockquote>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：人間の役員会議の進め方そのものです。 「自信が無い案は却下」「予算オーバーは論外」「僅差なら独断せず上に諮る」。 あなたの企画思想「説明可能で、暴走しない自動意思決定」が、この6行に結晶しています。</p>
+<hr>
+<h2>🟢 点数のつけ方：score_scenario（33〜40行目）</h2>
+<pre><span class="lang">python</span><code>def score_scenario(scenario: dict, config: dict) -&gt; float:
+    weights = config[&quot;weights&quot;]                          # 🟢 会社ごとの重み
+    return round(
+        weights[&quot;stockout&quot;] * scenario[&quot;stockout_cost&quot;]   # 🔴 欠品コスト × 重み
+        + weights[&quot;holding&quot;] * scenario[&quot;holding_cost&quot;]    # 🔴 在庫コスト × 重み
+        + weights[&quot;transport&quot;] * scenario[&quot;transport_cost&quot;],  # 🔴 輸送コスト × 重み
+        4,
+    )</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>各コストに <strong>会社ごとの重み</strong> を掛けて合計します（company_1.yaml では stockout:0.45, holding:0.25, transport:0.30）。 点数が <strong>低いほど良い</strong>（コストが小さい）。だから④で <code>sorted</code>（昇順）して1位＝最良としています。</p>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：重みは「何を一番重視するか」の経営判断です。 欠品を何より避けたい会社は <code>stockout</code> の重みを上げる。<code>3-6</code> でエージェントが出した各コストが、 ここで会社の価値観（重み）と掛け合わされ、1つの点数になります。<strong>設定YAMLを変えれば判断が変わる</strong> わけです。</p>
+<hr>
+<h2>🟢 制約チェック：check_constraints（43〜49行目）</h2>
+<pre><span class="lang">python</span><code>def check_constraints(scenario: dict, config: dict) -&gt; bool:   # 🔵 OKならTrue/NGならFalse
+    constraints = config[&quot;constraints&quot;]
+    if scenario[&quot;confidence&quot;] &lt; constraints[&quot;min_confidence&quot;]:   # 🔴 信頼度が最低ライン未満→NG
+        return False
+    if scenario[&quot;total_cost&quot;] &gt; constraints[&quot;max_budget_jpy&quot;]:   # 🔴 予算オーバー→NG
+        return False
+    return scenario[&quot;transport_cost&quot;] &lt;= constraints[&quot;max_transport_cost_jpy&quot;]  # 🔴 輸送費上限以内ならOK</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>3つの関門（最低信頼度・予算・輸送費）を全部くぐれた案だけ <code>True</code>。 <code>resolve</code> の②で、この関数が <code>True</code> を返す案だけが <code>viable</code> に残ります。</p>
+<hr>
+<h2>🟢 僅差判定：is_ambiguous（61〜67行目）</h2>
+<pre><span class="lang">python</span><code>def is_ambiguous(ranked: list[dict], config: dict) -&gt; bool:
+    if len(ranked) &lt; 2:                                  # 🟡 案が1つなら比較不能→僅差ではない
+        return False
+    threshold = config[&quot;escalation&quot;][&quot;ambiguity_threshold&quot;]   # 🟢 僅差とみなす閾値(例:0.05)
+    best = score_scenario(ranked[0], config)             # 🟢 1位の点数
+    second = score_scenario(ranked[1], config)           # 🟢 2位の点数
+    return abs(second - best) &lt;= max(best, 1.0) * threshold   # 🔴 差が小さければTrue(僅差)</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>1位と2位の点差を、1位の点数の <code>threshold</code>（5%）と比べます。 差が5%以内なら「どっちも大差ない＝独断は危険」と判断し、<code>resolve</code>⑤でエスカレーション。</p>
+<hr>
+<h2>🟢 決定を記録：create_decision（70〜91行目）</h2>
+<p>最良案が決まったら、<code>CEODecision</code>（決定の記録）を作ってDBに保存します。 注目は <code>rationale</code>（決定理由）と <code>causal_chain</code>（なぜこの判断に至ったかの因果の鎖）を残している点：</p>
+<pre><span class="lang">python</span><code>rationale=&quot;Lowest weighted scenario that satisfies constraints.&quot;,   # 🔴 決定理由を文字で残す
+causal_chain={                                                       # 🔴 判断の経緯を記録
+    &quot;event_id&quot;: event.id,
+    &quot;event_type&quot;: event.event_type.value,
+    &quot;selected_scenario&quot;: selected[&quot;name&quot;],
+},</code></pre>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これが「<strong>説明可能なAI</strong>」の核心です。 ただ決めるだけでなく「なぜそう決めたか」を必ず記録に残す。後から人間が監査できる。 あなたの企画で最も重要な価値の1つが、この数行に実装されています。</p>
+<hr>
+<h2>✅ 検証ポイント</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>エスカレーション条件の順序</strong>：①低信頼→②制約→⑤僅差 の順。順序が変わると挙動が変わる。</li></ul>
+<p>例えば制約チェックより先に僅差判定すると、予算オーバーの案で僅差判定してしまう。順序の意図を読む。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong><code>sorted</code> の向き</strong>：点数は「低いほど良い」。昇順(<code>sorted</code>はデフォルト昇順)で1位を採るのが正しい。</li></ul>
+<p>もし「高いほど良い」と取り違えて <code>ranked[0]</code> を採ると、<strong>最悪の案を選ぶ</strong> 重大バグになる。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>空・1件のケア</strong>：<code>is_ambiguous</code> の <code>if len(ranked) &lt; 2</code> のように、件数が少ないときの処理があるか。</li><li class="callout c-check"><span class="tag">検証</span><strong>決定理由を残しているか</strong>：<code>rationale</code> や <code>causal_chain</code> のような監査情報。</li></ul>
+<p>これが無いAI判断は「なぜそうした？」に答えられず、検証不能になる。</p>
+<hr>
+<h2>🎉 旅の終わり</h2>
+<p>お疲れさまでした。<code>3-2</code> でイベントを受け取ってから、ここでCEOが決定を下すまで、 1件のイベントが ASCT を旅する全行程を追い切りました。</p>
+<p>もう一度 <code>2-1</code> の地図を開いて、①〜⑧を <strong>自分の言葉で</strong> たどってみてください。 すべてのファイルが地図のどこに対応するか、見えるはずです。</p>
+<p>次は、この旅のあちこちで出てきた「DBから取ってくる」「DBに保存する」の正体、 <strong>データベースとSQL</strong> を学びます。→ <code>04-database-and-sql/4-1</code></p></div></body></html>

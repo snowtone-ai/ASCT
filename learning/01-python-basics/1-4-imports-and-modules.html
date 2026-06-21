@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1-4 import とモジュール — コードを分けて、持ってくる</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>1-4 import とモジュール — コードを分けて、持ってくる</h1>
+<blockquote><p>このレッスンのゴール：ファイルの先頭に並ぶ <code>import 〜</code> / <code>from 〜 import 〜</code> が読めるようになる。</p><p>これが読めると「このファイルは、どこの何を使っているか」が分かり、コードを追えるようになります。</p></blockquote>
+<hr>
+<h2>🔵 なぜファイルを分けるのか</h2>
+<p>ASCT は38本の <code>.py</code> ファイルでできています。1本に全部書くと数千行になって、誰も読めません。 そこで <strong>役割ごとにファイルを分け</strong>、必要なときに「持ってくる」のです。</p>
+<ul><li>1本のファイル = <strong>モジュール</strong></li><li>フォルダにまとめたモジュール群 = <strong>パッケージ</strong>（例：<code>src/agents/</code> フォルダは「agentsパッケージ」）</li></ul>
+<hr>
+<h2>🔵 import の2つの書き方</h2>
+<h3>書き方A：<code>import モジュール名</code></h3>
+<pre><span class="lang">python</span><code>import yaml          # 🔵 yaml という道具一式を持ってくる</code></pre>
+<p>使うときは <code>yaml.safe_load(...)</code> のように「モジュール名.機能」と書きます。</p>
+<h3>書き方B：<code>from モジュール import 必要なものだけ</code></h3>
+<pre><span class="lang">python</span><code>from src.config.validator import validate_config   # 🔵 validator の中の validate_config だけ持ってくる</code></pre>
+<p>使うときは <code>validate_config(...)</code> と、名前だけで直接呼べます。</p>
+<p class="callout c-red"><span class="tag">重要</span><strong>読み方</strong>：<code>from A import B</code> は「<strong>Aという場所から、Bを持ってくる</strong>」。 これが読めれば、<code>B</code> の定義が <code>A</code> というファイルにあると分かり、追いかけられます。</p>
+<hr>
+<h2>🟢 ASCT の本物のコードで見る</h2>
+<p><code>src/orchestrator/run_composer.py</code> の冒頭（1〜8行目）：</p>
+<pre><span class="lang">python</span><code>from __future__ import annotations          # ⚪ おまじない。型ヒントを書きやすくするためのもの（無視してOK）
+
+from sqlalchemy.orm import Session          # 🔵 外部ライブラリから「Session」を持ってくる
+                                            #    （DBとの会話窓口。glossary参照）
+from src.agents import PluginRegistry       # 🔵 自分のagentsパッケージから「PluginRegistry」を持ってくる
+from src.models import Event                # 🔵 自分のmodelsパッケージから「Event」を持ってくる
+from src.orchestrator.ceo import CEOOrchestrator      # 🔵 同じorchestrator内のceo.pyから持ってくる
+from src.orchestrator.escalation import create_escalation  # 🔵 escalation.pyから関数を持ってくる</code></pre>
+<p><strong>この冒頭だけで分かること</strong>： このファイル（run_composer）は、</p>
+<ul><li><code>PluginRegistry</code>（エージェント登録係）</li><li><code>CEOOrchestrator</code>（CEO役）</li><li><code>create_escalation</code>（人間に委ねる処理）</li></ul>
+<p>を <strong>使う</strong> らしい、と。つまり import を読むだけで「このファイルが誰と協力するか」が見えます。</p>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での読解術</strong>：知らないファイルを開いたら、<strong>まず import の行を読む</strong>。 そこに「このファイルが頼っている相手」が全部書いてあります。 登場人物の一覧を最初に確認する、推理小説の読み方と同じです。</p>
+<hr>
+<h2>🔵 <code>src.</code> は何者か</h2>
+<p><code>from src.agents import ...</code> の <code>src</code> は、ASCT のソースコードが入った一番上のフォルダの名前です。 <code>src.orchestrator.ceo</code> は「<code>src</code> フォルダ → <code>orchestrator</code> フォルダ → <code>ceo.py</code> ファイル」を ドットでつないだ住所表記です。</p>
+<pre><code>src/                       ← src
+ └ orchestrator/           ← src.orchestrator
+    └ ceo.py               ← src.orchestrator.ceo
+       └ class CEOOrchestrator   ← src.orchestrator.ceo.CEOOrchestrator</code></pre>
+<p class="callout c-yellow"><span class="tag">注意</span><strong>注意</strong>：<code>from src.orchestrator.ceo import CEOOrchestrator</code> を読んだら、 「<code>src/orchestrator/ceo.py</code> を開けば <code>CEOOrchestrator</code> の中身が見られる」と分かります。 <strong>import は、コードの中の道案内（リンク）</strong> だと思ってください。</p>
+<hr>
+<h2>✅ 検証ポイント（AIコードを読むとき）</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>使っているのに import されていない</strong>：コード中に <code>Session</code> が出てくるのに、</li></ul>
+<p>上に <code>import</code> が無ければエラー（<code>NameError</code>）。AIが import を書き忘れる典型バグ。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>import したのに使っていない</strong>：持ってきたのに一度も使わない行。害は少ないが、</li></ul>
+<p>「本当はここで使うはずだったのでは？」というロジック漏れのサインのことがある。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>どこから来たか</strong>：知らない関数が出てきたら、上の import を見れば「出身ファイル」が分かる。</li></ul>
+<hr>
+<h2>🧠 理解チェック</h2>
+<p><code>src/api/routes_events.py</code> の冒頭にこうあります：</p>
+<pre><span class="lang">python</span><code>from src.orchestrator.run_composer import RunComposer</code></pre>
+<p><code>RunComposer</code> の本体（定義）は、どのファイルを開けば見られる？ （答え：<code>src/orchestrator/run_composer.py</code>。まさに前のレッスンで見たファイルです）</p></div></body></html>

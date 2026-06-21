@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1-1 変数と型 — 値に名前をつける</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>1-1 変数と型 — 値に名前をつける</h1>
+<blockquote><p>このレッスンのゴール：コードに出てくる <code>x = 5</code> のような行が「何をしているか」分かるようになる。</p></blockquote>
+<hr>
+<h2>🔵 変数 = 値を入れる「ラベル付きの箱」</h2>
+<p>プログラムは、計算した結果や受け取ったデータを、後で使うために「箱」にしまいます。 その箱に名前（ラベル）をつけたものが <strong>変数</strong> です。</p>
+<pre><span class="lang">python</span><code>price = 100          # 🔵 price という箱に 100 を入れる
+name = &quot;りんご&quot;       # 🔵 name という箱に「りんご」という文字を入れる
+total = price * 3    # 🔵 計算結果(300)を total という箱に入れる</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>読み方の鉄則</strong>：<code>=</code> は「等しい」ではなく「<strong>右の値を左の箱に入れる</strong>」という意味です。 数学の <code>=</code> とは違います。<code>price = 100</code> は「price に 100 を入れろ」という命令です。</p>
+<hr>
+<h2>🔵 型 = 箱に入っている「値の種類」</h2>
+<p>値にはいくつか種類（<strong>型</strong>）があります。最初は次の4つだけ覚えれば十分です。</p>
+<table><thead><tr><th>型の名前</th><th>何を表すか</th><th>例</th></tr></thead><tbody><tr><td><code>int</code>（整数）</td><td>小数点のない数</td><td><code>100</code>, <code>-5</code>, <code>0</code></td></tr><tr><td><code>float</code>（浮動小数点数）</td><td>小数点のある数</td><td><code>0.95</code>, <code>1500.0</code>, <code>3.14</code></td></tr><tr><td><code>str</code>（文字列）</td><td>文字・文章。<strong>必ずクオートで囲む</strong></td><td><code>&quot;りんご&quot;</code>, <code>&quot;demand_spike&quot;</code></td></tr><tr><td><code>bool</code>（真偽値）</td><td>「はい/いいえ」の2択</td><td><code>True</code>, <code>False</code></td></tr></tbody></table>
+<p class="callout c-yellow"><span class="tag">注意</span><strong>注意</strong>：<code>&quot;100&quot;</code>（クオート付き）と <code>100</code>（クオートなし）は別物です。 前者は「文字としての100」、後者は「数としての100」。計算に使えるのは後者だけです。 AIコードのバグでよくあるのが、この2つの取り違えです。</p>
+<hr>
+<h2>🟢 ASCT の本物のコードで見る</h2>
+<p><code>src/orchestrator/confidence.py</code> の中にこんな行があります（13〜14行目）：</p>
+<pre><span class="lang">python</span><code>half_life_hours = confidence_config[&quot;staleness_half_life_hours&quot;]  # 🔵 設定値を箱に取り出す
+staleness_factor = 0.5 ** (data_age_hours / half_life_hours)      # 🟢 計算結果を箱に入れる</code></pre>
+<p><strong>1行ずつ読む</strong>：</p>
+<ul><li>1行目：<code>confidence_config</code> という設定の中から <code>staleness_half_life_hours</code>（古さの半減期＝12時間）を</li></ul>
+<p>取り出して、<code>half_life_hours</code> という短い名前の箱に入れ直しています。長い名前を毎回書くのは大変なので、使いやすい名前に置き換えているだけです。</p>
+<ul><li>2行目：<code>0.5  の (経過時間 ÷ 半減期) 乗</code> を計算し、<code>staleness_factor</code>（古さによる減点率）に入れています。</li></ul>
+<p><code>**</code> は「べき乗」、<code>/</code> は「割り算」です。</p>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これは「データが古いほど信頼度を下げる」計算です。 食品の在庫データは12時間で価値が半分になる、というルールをコードにした部分。 あなたが企画した「鮮度が判断に効く」という思想が、まさにこの1行に宿っています。</p>
+<hr>
+<h2>✅ 検証ポイント（AIコードを読むとき）</h2>
+<p>AIが書いた変数まわりのコードを読むときは、次を確認します：</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>名前と中身が合っているか</strong>：<code>price</code> という箱に名前の文字列が入っていたら怪しい。</li><li class="callout c-check"><span class="tag">検証</span><strong>型が合っているか</strong>：数として計算したいのに <code>&quot;100&quot;</code> と文字列になっていないか。</li><li class="callout c-check"><span class="tag">検証</span><strong><code>=</code>（代入）と <code>==</code>（比較）の取り違え</strong>：<code>if x = 5:</code> はバグ（<code>==</code> が正しい）。次のレッスン以降で詳しく。</li></ul>
+<hr>
+<h2>🧠 理解チェック（Claudeに聞いてみよう）</h2>
+<p>次の行は何をしている？ と自分で説明してから、Claude に答え合わせしてもらいましょう：</p>
+<pre><span class="lang">python</span><code>trend = (recent - previous) / max(previous, 1.0)</code></pre>
+<p>（ヒント：<code>src/agents/demand_forecaster.py</code> の27行目あたり。<code>recent</code>＝最近の売上、<code>previous</code>＝その前の売上）</p></div></body></html>

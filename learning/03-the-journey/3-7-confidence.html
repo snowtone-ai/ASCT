@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3-7 信頼度の計算 — confidence.py を読む</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>3-7 信頼度の計算 — confidence.py を読む</h1>
+<blockquote><p>「この判断、どれくらい信用していいか」を数値にする小さな（しかし重要な）ファイル。</p><p>対象ファイル：<code>src/orchestrator/confidence.py</code>（全23行）</p></blockquote>
+<hr>
+<h2>🟣 このファイルの役割</h2>
+<p>各打ち手の <strong>信頼度（0.0〜1.0）</strong> を計算します。 信頼度は、CEOが「自動で決めるか／人間に委ねるか」を分ける重要な物差しになります（<code>3-8</code>）。</p>
+<p class="callout c-purple"><span class="tag">実務</span>あなたの企画した「鮮度や情報源によって、判断の確からしさが変わる」という思想が、 この23行に凝縮されています。</p>
+<hr>
+<h2>🟢 全文を読む</h2>
+<pre><span class="lang">python</span><code>def calculate_confidence(
+    base: float,                  # 🔵 基準となる信頼度（例:0.95）
+    data_age_hours: float,        # 🔵 データの古さ（何時間前のものか）
+    source: str,                  # 🔵 情報源（sensor / api / manual）
+    perishability_factor: float,  # 🔵 鮮度係数（傷みやすさによる減点）
+    historical_accuracy: float,   # 🔵 過去の予測精度
+    config: dict,                 # 🔵 会社設定
+) -&gt; float:                       # 🔴 最終的な信頼度(0〜1)を返す
+    confidence_config = config[&quot;confidence&quot;]                    # 🟢 設定から信頼度パラメータを取り出す
+    half_life_hours = confidence_config[&quot;staleness_half_life_hours&quot;]  # 🟢 古さの半減期（食品は12時間）
+    staleness_factor = 0.5 ** (data_age_hours / half_life_hours)      # 🔴 古さによる減点率
+    source_multiplier = confidence_config[&quot;source_multipliers&quot;].get(source, 0.7)  # 🔴 情報源の信頼倍率
+    score = (                     # 🔴 すべてを掛け合わせる
+        base
+        * staleness_factor
+        * source_multiplier
+        * perishability_factor
+        * historical_accuracy
+    )
+    return round(min(max(score, 0.0), 1.0), 4)   # 🔴 0〜1の範囲に収めて、小数4桁に丸める</code></pre>
+<hr>
+<h2>🔵 計算の考え方 — 「減点方式」</h2>
+<p>基準値(<code>base</code>)から始めて、<strong>怪しい要素を掛けて減らしていく</strong> 方式です。 掛ける数はどれも 0〜1 なので、掛けるほど値は下がります（減点）。</p>
+<h3>① 古さによる減点 <code>staleness_factor</code></h3>
+<pre><span class="lang">python</span><code>staleness_factor = 0.5 ** (data_age_hours / half_life_hours)</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>これは「<strong>半減期</strong>」の考え方。<code>half_life_hours</code>（=12時間）ごとに信頼度が半分になります。</p>
+<ul><li>データが 0時間前（今）→ <code>0.5の0乗</code> = 1.0（減点なし）</li><li>データが 12時間前 → <code>0.5の1乗</code> = 0.5（半分）</li><li>データが 24時間前 → <code>0.5の2乗</code> = 0.25（4分の1）</li></ul>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：「12時間前の食品在庫データは、もう半分しか信用できない」。 鮮度が命の食品サプライチェーンらしいルールです。<code>configs/company_1.yaml</code> に <code>staleness_half_life_hours: 12</code> と書かれており、<strong>会社ごとに変えられます</strong>。</p>
+<h3>② 情報源による減点 <code>source_multiplier</code></h3>
+<pre><span class="lang">python</span><code>source_multiplier = confidence_config[&quot;source_multipliers&quot;].get(source, 0.7)</code></pre>
+<p>設定の <code>source_multipliers</code> から、情報源に応じた倍率を引きます（company_1.yaml より）：</p>
+<ul><li><code>sensor</code>（センサー実測）→ 1.0（満点。減点なし）</li><li><code>api</code>（外部API）→ 0.85</li><li><code>manual</code>（手入力）→ 0.65</li></ul>
+<p class="callout c-yellow"><span class="tag">注意</span><code>.get(source, 0.7)</code> の <code>0.7</code> は「もし知らない情報源だったら、とりあえず0.7」という保険（1-3で学んだ <code>.get</code> の既定値）。</p>
+<h3>③ 全部掛ける</h3>
+<p><code>base × 古さ × 情報源 × 鮮度 × 過去精度</code>。1つでも低ければ、全体が大きく下がります。 「どれか1つでも怪しければ信用しない」という慎重な設計です。</p>
+<h3>④ 範囲に収める <code>round(min(max(score, 0.0), 1.0), 4)</code></h3>
+<ul><li><code>max(score, 0.0)</code> … 0未満なら0に（下限）</li><li><code>min(..., 1.0)</code> … 1超なら1に（上限）</li><li><code>round(..., 4)</code> … 小数4桁に丸める</li></ul>
+<p class="callout c-red"><span class="tag">重要</span>この「<code>min(max(x, 下限), 上限)</code> で範囲に押し込める」形は <strong>超頻出パターン</strong>（クランプと呼ぶ）。 覚えておくと、いろんなコードで「ああ、0〜1に収めてるな」と即読みできます。</p>
+<hr>
+<h2>✅ 検証ポイント</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>範囲の保証</strong>：信頼度は必ず0〜1であるべき。<code>min/max</code> のクランプがあるか。</li></ul>
+<p>無いと、計算次第で1.2や-0.3のような「ありえない信頼度」が出て、CEOの判断を狂わせる。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>0除算</strong>：<code>data_age_hours / half_life_hours</code> で、<code>half_life_hours</code> が0だとエラー。</li></ul>
+<p>設定値が0でないことが前提。設定の検証（validator）でガードされているか気にする。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>掛け算の向き</strong>：信頼を「下げる」要素なのに、うっかり足し算や割り算にすると逆効果になる。</li></ul>
+<p>各係数が「0〜1で掛けて減点」という設計と整合しているか。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>既定値の妥当性</strong>：<code>.get(source, 0.7)</code> の 0.7 は妥当か。未知の情報源を甘く見積もりすぎていないか。</li></ul>
+<hr>
+<h2>🧭 次へ</h2>
+<p>打ち手（コストと信頼度つき）が出そろいました。 いよいよCEOが、それらを見比べて最終決定する山場へ。→ <code>3-8</code></p></div></body></html>

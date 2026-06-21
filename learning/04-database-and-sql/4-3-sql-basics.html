@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>4-3 SQLの基礎 — データベースへの命令文</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>4-3 SQLの基礎 — データベースへの命令文</h1>
+<blockquote><p>ORM の裏で動いている SQL の基本を、最小限だけ学びます。</p><p>「ORMのコードが、裏でどんなSQLになっているか」が想像できるようになるのがゴール。</p></blockquote>
+<hr>
+<h2>🔵 SQL の4大命令（CRUD）</h2>
+<p>DB操作は、突き詰めると4種類です。頭文字をとって <strong>CRUD（クラッド）</strong> と呼びます。</p>
+<table><thead><tr><th>操作</th><th>SQL</th><th>日本語</th><th>ASCTのORM</th></tr></thead><tbody><tr><td>Create（作成）</td><td><code>INSERT</code></td><td>新しい行を追加</td><td><code>db.add(...)</code></td></tr><tr><td>Read（読取）</td><td><code>SELECT</code></td><td>行を取ってくる</td><td><code>db.query(...)</code></td></tr><tr><td>Update（更新）</td><td><code>UPDATE</code></td><td>既存の行を書き換え</td><td>属性に代入して <code>commit</code></td></tr><tr><td>Delete（削除）</td><td><code>DELETE</code></td><td>行を消す</td><td><code>db.query(...).delete()</code></td></tr></tbody></table>
+<p class="callout c-purple"><span class="tag">実務</span>ASCT で一番よく出るのは <strong>SELECT（読取）</strong> です。エージェントが判断材料を集めるのに使います。</p>
+<hr>
+<h2>🔵 SELECT 文の読み方</h2>
+<p>SELECT は「どの列を・どの表から・どんな条件で」取ってくるかを書きます。</p>
+<pre><span class="lang">sql</span><code>SELECT quantity_sold        -- ① どの列を：売上数量を
+FROM sales_history          -- ② どの表から：売上履歴テーブルから
+WHERE product_id = 5        -- ③ どんな条件で：商品IDが5のものだけ
+  AND date &gt;= &#x27;2026-05-06&#x27;; -- ④ 追加条件：この日付以降</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>4つの部品</strong>：</p>
+<ul><li><code>SELECT 列名</code> … 取り出す列（<code>*</code> なら全列）</li><li><code>FROM 表名</code> … どの表から</li><li><code>WHERE 条件</code> … 絞り込み条件（<code>AND</code> で複数つなげる）</li><li>（他に <code>ORDER BY</code>＝並べ替え、<code>SUM()</code>＝合計 などがある）</li></ul>
+<hr>
+<h2>🔵 集計関数 SUM — 合計を出す</h2>
+<p>ASCT は売上の合計をよく計算します。SQL では <code>SUM()</code> を使います。</p>
+<pre><span class="lang">sql</span><code>SELECT SUM(quantity_sold)   -- 売上数量の合計を
+FROM sales_history
+WHERE product_id = 5
+  AND date &gt;= &#x27;2026-05-06&#x27;
+  AND date &lt; &#x27;2026-05-12&#x27;;  -- 指定期間の</code></pre>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これは <code>3-6</code> の「直近7日の売上合計」を出すクエリそのものです。 バイヤーが「先週この商品いくつ売れた？」と聞くのを、SQL にするとこうなります。</p>
+<hr>
+<h2>🔵 JOIN — 複数の表をつなぐ</h2>
+<p>データは複数の表に分かれて保存されています（<code>events</code>、<code>companies</code>、<code>products</code>…）。 それらを <strong>つなげて</strong> 取り出すのが <code>JOIN</code> です。</p>
+<pre><span class="lang">sql</span><code>SELECT inventory_policies.reorder_point, products.category
+FROM inventory_policies
+JOIN products ON inventory_policies.product_id = products.id   -- 商品IDで2表をつなぐ
+WHERE products.category = &#x27;fresh_produce&#x27;;</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>「在庫方針」表と「商品」表を、商品IDをカギにして連結し、カテゴリで絞っています。 🟣 これは <code>3-6</code> の <code>query_policies</code> がやっていることに近い操作です（ORMでは <code>.join()</code> と書く）。</p>
+<hr>
+<h2>🔵 なぜ ORM があるのに SQL を学ぶのか</h2>
+<p>ASCT は ORM を使うので、普段は SQL を直接書きません。でも SQL を知っておくと：</p>
+<ol><li><strong>ORM のコードが何をするか想像できる</strong>：<code>db.query(Event).filter_by(company_id=1)</code> を見て</li></ol>
+<p>「裏で <code>SELECT * FROM events WHERE company_id=1</code> だな」と読める。</p>
+<ol><li><strong>遅いコードに気づける</strong>：何度もDBに問い合わせる無駄なコードを見抜ける（<code>4-4</code>で触れる）。</li><li><strong>AIのDB操作を検証できる</strong>：AIが生成したクエリが「本当に意図した行を取るか」を確かめられる。</li></ol>
+<hr>
+<h2>✅ 検証ポイント</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>WHERE の抜け</strong>：条件を書き忘れると、全件取得・全件更新・全件削除になる。</li></ul>
+<p>特に <code>DELETE</code> や <code>UPDATE</code> で <code>WHERE</code> 抜けは <strong>大事故</strong>。AIコードで最も危険なパターンの1つ。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>期間の境界</strong>：<code>&gt;= 開始 AND &lt; 終了</code> のように、端の含む/含まないが正しいか。</li></ul>
+<p><code>3-6</code> も <code>&gt;= start, &lt; end</code> と、重複しないよう設計されている。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>JOIN の条件</strong>：<code>ON ...</code> のつなぐ列が正しいか。間違うと無関係な行同士が結合され、変な結果になる。</li></ul>
+<hr>
+<h2>🧭 次へ</h2>
+<p>実際に ASCT のコードの中の SQL（ORM）クエリを読んでみましょう。→ <code>4-4</code></p></div></body></html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1-3 辞書とリスト — データをまとめて持つ</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>1-3 辞書とリスト — データをまとめて持つ</h1>
+<blockquote><p>このレッスンのゴール：<code>{...}</code> と <code>[...]</code> が出てきたとき、何が入っているか読めるようになる。</p><p>ASCT のコードは「辞書」と「リスト」だらけです。ここが読めると一気に視界が開けます。</p></blockquote>
+<hr>
+<h2>🔵 リスト <code>[...]</code> = 順番に並んだ値の列</h2>
+<pre><span class="lang">python</span><code>prices = [100, 200, 300]        # 🔵 3つの数を順番に並べたリスト
+agents = [&quot;DemandForecaster&quot;, &quot;InventoryOptimizer&quot;]  # 🔵 文字列のリスト</code></pre>
+<p>中身は <strong>順番（インデックス）</strong> で取り出します。番号は <strong>0から</strong> 始まります。</p>
+<pre><span class="lang">python</span><code>prices[0]   # → 100  （0番目＝最初）
+prices[2]   # → 300  （2番目＝3つ目）</code></pre>
+<p class="callout c-yellow"><span class="tag">注意</span><strong>注意</strong>：「1番目」が <code>[0]</code> です。日常の数え方と1つズレるので、最初は戸惑います。 「0から数える」と覚えてください。</p>
+<hr>
+<h2>🔵 辞書 <code>{...}</code> = 「名前：値」のペアの集まり</h2>
+<p>リストが「順番で取り出す」のに対し、辞書は <strong>名前（キー）で取り出します</strong>。</p>
+<pre><span class="lang">python</span><code>product = {                    # 🔵 1つの商品を表す辞書
+    &quot;name&quot;: &quot;りんご&quot;,          # キー &quot;name&quot; → 値 &quot;りんご&quot;
+    &quot;price&quot;: 100,              # キー &quot;price&quot; → 値 100
+    &quot;category&quot;: &quot;fresh_produce&quot;,
+}</code></pre>
+<p>中身は <strong>キー</strong> で取り出します：</p>
+<pre><span class="lang">python</span><code>product[&quot;name&quot;]      # → &quot;りんご&quot;
+product[&quot;price&quot;]     # → 100</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>これが最重要</strong>：ASCT では、エージェントの提案（シナリオ）も、会社の設定も、 APIで受け取るデータも、ほとんどが <strong>辞書</strong> で表現されています。 <code>なにか[&quot;キー&quot;]</code> という形を見たら「辞書から値を取り出している」と即座に分かるようにしましょう。</p>
+<hr>
+<h2>🟢 ASCT の本物のコードで見る — シナリオは辞書</h2>
+<p><code>src/agents/demand_forecaster.py</code> の33〜40行目。エージェントが作る「打ち手の候補（シナリオ）」です：</p>
+<pre><span class="lang">python</span><code>return {                                              # 🔵 シナリオ1件を辞書で返す
+    &quot;name&quot;: f&quot;forecast_{policy.product.category}_{policy.location.name}&quot;,  # 打ち手の名前
+    &quot;stockout_cost&quot;: stockout_cost,                   # 🟢 欠品したときの損失コスト
+    &quot;holding_cost&quot;: holding_cost,                     # 🟢 在庫を抱えるコスト
+    &quot;transport_cost&quot;: 0.0,                            # 🟢 輸送コスト
+    &quot;total_cost&quot;: round(stockout_cost + holding_cost, 2),  # 🟢 合計コスト
+    &quot;confidence&quot;: confidence,                         # 🔴 この提案への自信(0〜1)
+}</code></pre>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これは「需要予測エージェントが出す1つの提案書」です。 「この打ち手だと、欠品コストはいくら、在庫コストはいくら、信頼度はこれくらい」という 見積もりが、6個のキーを持つ1つの辞書にまとまっています。</p>
+<p>そして、この辞書を <strong>CEOオーケストレーター</strong> が後で読んで（<code>scenario[&quot;total_cost&quot;]</code> のように）、 どの打ち手を採用するか決めます。<code>src/orchestrator/ceo.py</code> の36〜38行目を見てください：</p>
+<pre><span class="lang">python</span><code>weights[&quot;stockout&quot;] * scenario[&quot;stockout_cost&quot;]    # 🟢 シナリオ辞書から欠品コストを取り出して重みをかける
++ weights[&quot;holding&quot;] * scenario[&quot;holding_cost&quot;]     # 🟢 在庫コストにも重みをかける
++ weights[&quot;transport&quot;] * scenario[&quot;transport_cost&quot;] # 🟢 輸送コストにも</code></pre>
+<blockquote><p>🔴 つまり「エージェントが辞書を作る → CEOがその辞書を読む」。</p><p>辞書は、モジュール間で情報を受け渡す <strong>共通の入れ物</strong> なのです。</p></blockquote>
+<hr>
+<h2>🔵 組み合わせ：辞書のリスト</h2>
+<p>実際には「シナリオが何個もある」ので、<strong>辞書を並べたリスト</strong> がよく出てきます。</p>
+<pre><span class="lang">python</span><code>scenarios = [          # 🔵 リストの中に…
+    {&quot;name&quot;: &quot;案A&quot;, &quot;total_cost&quot;: 5000, &quot;confidence&quot;: 0.9},   # 辞書
+    {&quot;name&quot;: &quot;案B&quot;, &quot;total_cost&quot;: 4000, &quot;confidence&quot;: 0.7},   # 辞書
+]</code></pre>
+<p>これを1件ずつ処理するのが <code>for</code>（繰り返し）です。<code>ceo.py</code> の20行目：</p>
+<pre><span class="lang">python</span><code>viable = [scenario for scenario in scenarios if check_constraints(scenario, config)]</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>これは「<code>scenarios</code> の中の各 <code>scenario</code> について、<code>check_constraints</code> がOKなものだけ集めて <code>viable</code>（実行可能な案）というリストを作る」という意味。<strong>リスト内包表記</strong> という書き方です（1-3では「こういう形がある」とだけ知ればOK）。</p>
+<hr>
+<h2>✅ 検証ポイント（AIコードを読むとき）</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>存在しないキーを読んでいないか</strong>：辞書に無いキー <code>data[&quot;xxx&quot;]</code> を読むとエラーになる。</li></ul>
+<p>AIが「あるはず」と思い込んでアクセスして落ちる、はよくあるバグ。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>リストの番号がはみ出ていないか</strong>：3個のリストに <code>[5]</code> でアクセスするとエラー。</li><li class="callout c-check"><span class="tag">検証</span><strong>キー名のスペルミス</strong>：<code>&quot;confidence&quot;</code> と <code>&quot;confidance&quot;</code> を取り違えると、別物として扱われる。</li></ul>
+<hr>
+<h2>🧠 理解チェック</h2>
+<p>次の辞書から「信頼度」を取り出すには、どう書く？</p>
+<pre><span class="lang">python</span><code>result = {&quot;name&quot;: &quot;案A&quot;, &quot;total_cost&quot;: 4000, &quot;confidence&quot;: 0.82}</code></pre>
+<p>（答え：<code>result[&quot;confidence&quot;]</code> → <code>0.82</code>）</p></div></body></html>

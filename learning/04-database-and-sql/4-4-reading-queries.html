@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>4-4 コード中のクエリを読む — 本物のORMクエリ</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>4-4 コード中のクエリを読む — 本物のORMクエリ</h1>
+<blockquote><p>ASCT の実コードに出てくるORMクエリを読み、「裏でどんなSQLか」を想像する練習。</p><p>対象ファイル：<code>src/agents/demand_forecaster.py</code> の query系関数</p></blockquote>
+<hr>
+<h2>🟢 例1：在庫を1件取ってくる（query_inventory, 74〜79行目）</h2>
+<pre><span class="lang">python</span><code>def query_inventory(session, policy: InventoryPolicy) -&gt; Inventory:
+    return (
+        session.query(Inventory)                  # 🔵 Inventory表から
+        .filter_by(product_id=policy.product_id,  # 🔴 条件：この商品で
+                   location_id=policy.location_id) #        この拠点の
+        .one()                                     # 🔴 ちょうど1件を取る
+    )</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span><strong>裏のSQLに翻訳すると</strong>：</p>
+<pre><span class="lang">sql</span><code>SELECT * FROM inventory
+WHERE product_id = ? AND location_id = ?;</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong><code>.one()</code> の意味</strong>：「<strong>ちょうど1件</strong> あるはず」という取り方。</p>
+<ul><li>0件だったらエラー、2件以上でもエラーになります。</li><li>似た仲間：<code>.all()</code>（全件をリストで）、<code>.first()</code>（先頭1件、無ければNone）。</li></ul>
+<p class="callout c-yellow"><span class="tag">注意</span><strong>検証の勘所</strong>：<code>.one()</code> は「絶対1件」と断言する強い書き方。 もしデータが無い可能性があるなら <code>.first()</code> を使うべき。AIが <code>.one()</code> を安易に使い、 データ欠損時に予期せぬクラッシュ、はよくある。「ここは本当に必ず1件か？」と問う。</p>
+<hr>
+<h2>🟢 例2：売上を合計する（sales_sum, 60〜71行目）</h2>
+<pre><span class="lang">python</span><code>def sales_sum(session, policy, start, end) -&gt; float:
+    value = (
+        session.query(func.coalesce(func.sum(SalesHistory.quantity_sold), 0.0))  # 🔴 売上合計（無ければ0）
+        .filter(
+            SalesHistory.product_id == policy.product_id,   # 🔵 この商品
+            SalesHistory.location_id == policy.location_id, # 🔵 この拠点
+            SalesHistory.date &gt;= start,                     # 🔵 開始日以降
+            SalesHistory.date &lt; end,                        # 🔵 終了日より前
+        )
+        .scalar()                                            # 🔴 単一の値として取り出す
+    )
+    return float(value)</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span><strong>裏のSQLに翻訳すると</strong>：</p>
+<pre><span class="lang">sql</span><code>SELECT COALESCE(SUM(quantity_sold), 0.0) FROM sales_history
+WHERE product_id = ? AND location_id = ?
+  AND date &gt;= ? AND date &lt; ?;</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>2つの注目点</strong>：</p>
+<ul><li><code>func.sum(...)</code> … <code>4-3</code> で学んだ <code>SUM()</code>。売上数量の合計。</li><li><code>func.coalesce(..., 0.0)</code> … 「もし合計が NULL（該当行ゼロ）なら 0.0 にする」安全策。</li></ul>
+<p>売上ゼロの期間でもエラーにならず 0.0 が返る。<code>3-6</code> の trend 計算が壊れないための備え。</p>
+<ul><li><code>.scalar()</code> … 「表ではなく、1個の数値」を取り出す。合計値が1つ欲しいので。</li></ul>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：<code>3-6</code> の <code>sales_windows</code> がこの関数を2回呼んで、 「直近7日」「その前7日」の売上を出し、需要の伸びを計算していました。 この <code>sales_sum</code> こそ、需要予測の <strong>生データを集める井戸</strong> です。</p>
+<hr>
+<h2>🟢 例3：JOIN を使う（query_policies, 43〜48行目）</h2>
+<pre><span class="lang">python</span><code>def query_policies(session, company_id: int, target: str | None) -&gt; list[InventoryPolicy]:
+    query = session.query(InventoryPolicy).join(InventoryPolicy.product)  # 🔴 在庫方針と商品を連結
+    query = query.filter_by(company_id=company_id)                        # 🔵 この会社で絞る
+    if target:                                                            # 🟡 targetが指定されていれば…
+        query = query.filter_by(category=target)                         #     カテゴリでも絞る
+    return query.limit(5).all()                                          # 🔴 最大5件をリストで取得</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span><strong>裏のSQLに翻訳すると</strong>（target指定ありの場合）：</p>
+<pre><span class="lang">sql</span><code>SELECT * FROM inventory_policies
+JOIN products ON inventory_policies.product_id = products.id
+WHERE company_id = ? AND category = ?
+LIMIT 5;</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>注目点</strong>：</p>
+<ul><li><code>.join(InventoryPolicy.product)</code> … <code>4-3</code> の JOIN。在庫方針と商品表をつなぐ。</li><li><code>if target:</code> … 条件を <strong>動的に組み立てている</strong>。targetがある時だけ絞り込みを追加。</li></ul>
+<p>クエリを少しずつ組み上げる書き方です。</p>
+<ul><li><code>.limit(5)</code> … 最大5件まで（取りすぎ防止）。<code>4-3</code> には無かった <code>LIMIT</code>。</li></ul>
+<p class="callout c-yellow"><span class="tag">注意</span><strong>検証の勘所</strong>：<code>if target:</code> は、<code>target</code> が <code>None</code> や空文字のときカテゴリ絞りをスキップします。 これが意図通りか？ 「全カテゴリ対象」が正しい挙動か確認する。</p>
+<hr>
+<h2>🔴 まとめ：ORMクエリを読む手順</h2>
+<p>知らないORMクエリに出会ったら、この順で読みます：</p>
+<ol><li><strong><code>.query(なに)</code></strong> … どの表から取るか（FROM）</li><li><strong><code>.filter(...)</code> / <code>.filter_by(...)</code></strong> … どんな条件か（WHERE）</li><li><strong><code>.join(...)</code></strong> … 他の表とつなぐか（JOIN）</li><li><strong><code>.sum</code> / <code>.coalesce</code> など</strong> … 集計や加工はあるか</li><li><strong>最後の <code>.one()</code> / <code>.all()</code> / <code>.scalar()</code> / <code>.first()</code></strong> … どう取り出すか（1件/全件/数値）</li></ol>
+<p>この5点を押さえれば、たいていのクエリは「裏のSQL」に翻訳して理解できます。</p>
+<hr>
+<h2>✅ 総合検証ポイント</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>取り出し方の妥当性</strong>：<code>.one()</code>（必ず1件）か <code>.first()</code>（無いかも）か。データ欠損の可能性と合っているか。</li><li class="callout c-check"><span class="tag">検証</span><strong>NULLガード</strong>：<code>coalesce</code> のような「該当ゼロ件」の備えがあるか。無いと後続計算が壊れる。</li><li class="callout c-check"><span class="tag">検証</span><strong>LIMIT / 件数制御</strong>：取りすぎていないか。大量データを一度に取ると遅くなる。</li><li class="callout c-check"><span class="tag">検証</span><strong>N+1問題</strong>（応用）：ループの中で毎回クエリを投げていないか。<code>3-6</code> のように件数を絞り、</li></ul>
+<p>ループ内クエリを最小にしているか。「繰り返しの中のDB問い合わせ」は遅さの典型原因。</p>
+<hr>
+<h2>🎓 コース完走</h2>
+<p>ここまでで、ASCT を題材に <strong>Python の読み方 → 全体構造 → 1イベントの処理の旅 → DBとSQL</strong> をひと通り歩きました。</p>
+<p><code>progress.md</code> のすべてに <code>[x]</code> がついたら、最後の仕上げとして <code>3-2</code> をもう一度開き、<strong>コードを見ずに「イベントが来てから何が起こるか」を説明</strong> してみてください。 それができたら——あなたは「AIのコードを読んで検証できる人」です。おめでとうございます。</p></div></body></html>

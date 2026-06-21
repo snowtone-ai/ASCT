@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1-2 関数 — 入力を受け取り、結果を返す手続き</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>1-2 関数 — 入力を受け取り、結果を返す手続き</h1>
+<blockquote><p>このレッスンのゴール：<code>def 名前(...):</code> で始まるかたまりが「何の処理か」読めるようになる。</p></blockquote>
+<hr>
+<h2>🔵 関数 = 名前のついた「処理のかたまり」</h2>
+<p>同じ処理を何度も書くのは無駄です。そこで処理に名前をつけて、呼び出せるようにします。それが <strong>関数</strong> です。</p>
+<p>レシピのたとえ：</p>
+<ul><li><strong>材料</strong>（引数）を渡す → <strong>調理</strong>（処理）する → <strong>料理</strong>（返り値）が出てくる</li></ul>
+<pre><span class="lang">python</span><code>def add_tax(price):       # 🔵「add_tax」という関数を定義。priceを受け取る
+    result = price * 1.1  # 🟢 処理：1.1倍する（消費税10%）
+    return result         # 🔴 結果を返す</code></pre>
+<p>この関数を使う（<strong>呼び出す</strong>）には：</p>
+<pre><span class="lang">python</span><code>final_price = add_tax(100)   # 🟢 100を渡すと 110.0 が返ってきて final_price に入る</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>4つの部品を見分ける</strong>：</p>
+<ol><li><code>def</code> … 「これから関数を定義する」の合図</li><li><code>add_tax</code> … 関数の名前</li><li><code>(price)</code> … 受け取る入力（<strong>引数</strong>）</li><li><code>return ...</code> … 返す結果（<strong>返り値</strong>）。<code>return</code> がない関数は「何かをするが、値は返さない」。</li></ol>
+<hr>
+<h2>🟡 インデント（字下げ）が「かたまり」を決める</h2>
+<p>Python では、<strong>行頭の空白（インデント）</strong> が「どこからどこまでが関数の中身か」を表します。 波カッコ <code>{}</code> は使いません。</p>
+<pre><span class="lang">python</span><code>def greet(name):
+    message = &quot;こんにちは &quot; + name   # ← 字下げされている＝関数の中身
+    return message                    # ← これも中身
+                                      
+total = greet(&quot;田中&quot;)                 # ← 字下げなし＝関数の外</code></pre>
+<p class="callout c-yellow"><span class="tag">注意</span><strong>注意</strong>：字下げがずれると意味が変わったりエラーになります。 AIコードを読むとき「この行は字下げされている？」を意識すると、構造が見えてきます。</p>
+<hr>
+<h2>🟢 ASCT の本物のコードで見る</h2>
+<p><code>src/config/loader.py</code> 全体（短いので全部読めます）：</p>
+<pre><span class="lang">python</span><code>def load_company_config(company_id: int) -&gt; dict:                 # 🔵 会社IDを受け取り、設定(dict)を返す関数
+    path = CONFIG_DIR / f&quot;company_{company_id}.yaml&quot;              # 🟢 設定ファイルの場所を組み立てる
+    if not path.exists():                                        # 🟡 もしファイルが無ければ…
+        raise FileNotFoundError(f&quot;Company config not found: {company_id}&quot;)  # 🔴 エラーを出して止める
+    config = yaml.safe_load(path.read_text(encoding=&quot;utf-8&quot;))     # 🟢 ファイルを読んで dict に変換
+    errors = validate_config(config)                             # 🟢 別の関数を呼んで中身を検査
+    if errors:                                                   # 🟡 もし問題があれば…
+        raise ValueError(&quot;; &quot;.join(errors))                      # 🔴 エラーを出して止める
+    return config                                               # 🔴 検査を通った設定を返す</code></pre>
+<p><strong>この関数を一言でいうと</strong>：「会社番号を渡すと、その会社の設定を読み込んで返す。 ファイルが無かったり中身がおかしかったら、その場でエラーにする」。</p>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：<code>load_company_config(1)</code> を呼ぶと、<code>configs/company_1.yaml</code> （Freshfield Foods社の設定）が読み込まれます。会社ごとに「何を重視するか」を切り替える仕組みの入口です。</p>
+<p class="callout c-gray"><span class="tag">補足</span><strong>補足</strong>：<code>validate_config(config)</code> のように、関数の中から <strong>別の関数を呼ぶ</strong> ことができます。 関数が関数を呼び、それがまた別の関数を呼ぶ……この連鎖がプログラムの流れです。 本編（03章）では、この連鎖を1本の「旅」として追いかけます。</p>
+<hr>
+<h2>✅ 検証ポイント（AIコードを読むとき）</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>入力と出力が宣言通りか</strong>：<code>-&gt; dict</code> と書いてあるのに、途中で数字を返していないか。</li><li class="callout c-check"><span class="tag">検証</span><strong>エラー処理があるか</strong>：<code>load_company_config</code> のように「無かったら／おかしかったら」を</li></ul>
+<p>ちゃんと処理しているか。AIコードはここを省略しがちで、それがバグの温床になります。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong><code>return</code> を忘れていないか</strong>：結果を返すはずの関数に <code>return</code> が無いと、呼び出し側で <code>None</code>（空）になる。</li></ul>
+<hr>
+<h2>🧠 理解チェック</h2>
+<p><code>src/main.py</code> の最後にある、この小さな関数は何を返す？</p>
+<pre><span class="lang">python</span><code>@app.get(&quot;/health&quot;)
+def health() -&gt; dict:
+    return {&quot;status&quot;: &quot;ok&quot;}</code></pre>
+<p>（ヒント：<code>@app.get(...)</code> は次章で説明します。今は <code>health</code> 関数が何を返すかだけ考えてください。）</p></div></body></html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>4-2 モデルの読み方 — 表の設計図を読む</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>4-2 モデルの読み方 — 表の設計図を読む</h1>
+<blockquote><p>DBの「表」に対応する Python クラス（モデル）の読み方を学びます。</p><p>対象ファイル：<code>src/models/event.py</code>、<code>src/models/base.py</code></p></blockquote>
+<hr>
+<h2>🔵 モデル = 表の設計図</h2>
+<p class="callout c-blue"><span class="tag">概念</span><strong>モデル (Model)</strong> とは、DBの1つの表に対応する Python クラスです。</p>
+<ul><li>クラス <code>Event</code> ＝ 表 <code>events</code></li><li>クラスの「属性」＝ 表の「列」</li><li>そのクラスのインスタンス1つ ＝ 表の「1行」</li></ul>
+<p><code>3-2</code> で <code>event = Event(...)</code> と作ったあの実物が、<code>events</code> 表の1行になるわけです。</p>
+<hr>
+<h2>🟢 Event モデルを読む（event.py 41〜58行目）</h2>
+<pre><span class="lang">python</span><code>class Event(ModelMixin, Base):                     # 🔵 Eventモデル。ModelMixinとBaseを継承
+    __tablename__ = &quot;events&quot;                        # 🔴 対応する表の名前は &quot;events&quot;
+
+    event_type: Mapped[EventType] = mapped_column(  # 🔵 列：event_type。種類を表す
+        Enum(EventType, values_callable=enum_values), nullable=False  # 🟡 必須(nullable=False=空不可)
+    )
+    description: Mapped[str] = mapped_column(String(500), nullable=False)  # 🔵 列：説明（最大500文字・必須）
+    priority: Mapped[EventPriority] = mapped_column(...)   # 🔵 列：優先度
+    data: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)  # 🔵 列：付随データ(JSON)
+    company_id: Mapped[int] = mapped_column(ForeignKey(&quot;companies.id&quot;), nullable=False)  # 🔴 列：会社への参照
+
+    company: Mapped[Company] = relationship(back_populates=&quot;events&quot;)   # 🟣 関連：所属する会社
+    signals: Mapped[list[Signal]] = relationship(back_populates=&quot;event&quot;)  # 🟣 関連：このイベントの信号たち
+    agent_decisions: Mapped[list[AgentDecision]] = relationship(...)   # 🟣 関連：エージェント判断たち
+    ceo_decisions: Mapped[list[CEODecision]] = relationship(...)       # 🟣 関連：CEO決定たち
+    escalations: Mapped[list[EscalationRecord]] = relationship(...)    # 🟣 関連：エスカレーションたち</code></pre>
+<hr>
+<h2>🔵 列の定義を読む4つの部品</h2>
+<p><code>event_type: Mapped[EventType] = mapped_column(...)</code> を分解します：</p>
+<ol><li><code>event_type</code> … 列（属性）の名前</li><li><code>Mapped[EventType]</code> … 型ヒント（1-6）。「中身は EventType」。<code>Mapped[...]</code>は「DB列ですよ」の印</li><li><code>mapped_column(...)</code> … 「これはDBの列だ」という宣言と、その細かい設定</li><li>設定の中身：</li><li><code>nullable=False</code> … 🔴 <strong>空(NULL)を許さない＝必須</strong>。<code>3-2</code>で必須だった理由はここ。</li><li><code>String(500)</code> … 文字列で最大500文字</li><li><code>default=dict</code> … 指定されなければ空の辞書</li></ol>
+<p class="callout c-red"><span class="tag">重要</span><strong><code>nullable=False</code> は超重要</strong>：これがコード(モデル)と <code>3-2</code>(API)を結びつけます。 モデルで「必須」と定めた列は、APIで <code>payload[&quot;...&quot;]</code>（必須読み取り）になっている。 <strong>DB設計とAPI実装が一致しているか</strong> を、この観点で検証できます。</p>
+<hr>
+<h2>🟣 relationship — 表と表のつながり</h2>
+<p><code>company: Mapped[Company] = relationship(...)</code> のような行は <strong>列ではなく「関連」</strong> です。 「このイベントは、どの会社に属し、どんな信号・判断を持つか」という <strong>他の表とのつながり</strong> を表します。</p>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これのおかげで、コードで <code>event.company</code>（このイベントの会社）や <code>event.ceo_decisions</code>（このイベントへのCEO判断一覧）と、表をまたいで自然にたどれます。 <code>3-6</code> の <code>policy.product.category</code> のように <strong>ドットで関連をたどる</strong> のは、この relationship のおかげです。</p>
+<hr>
+<h2>🟢 共通の親 ModelMixin（base.py 22〜32行目）</h2>
+<p><code>Event</code> は <code>ModelMixin</code> を継承していました。その中身：</p>
+<pre><span class="lang">python</span><code>class ModelMixin:
+    id: Mapped[int] = mapped_column(primary_key=True)          # 🔴 全モデル共通：ID（主キー）
+    created_at: Mapped[datetime] = mapped_column(..., default=utc_now)  # 🔵 作成日時（自動）
+    updated_at: Mapped[datetime] = mapped_column(..., onupdate=utc_now) # 🔵 更新日時（自動）
+    source: Mapped[SourceType] = mapped_column(..., default=SourceType.MANUAL)  # 🔵 情報源</code></pre>
+<p class="callout c-blue"><span class="tag">概念</span>すべてのモデルが共通で持つべき列（ID・作成日時・更新日時・情報源）を、ここにまとめています。 継承（3-5）の活用：各モデルでこれらを毎回書かずに済みます。</p>
+<ul><li><code>primary_key=True</code> … 🔴 その表の中で <strong>1行を一意に識別する番号</strong>。<code>3-2</code>の <code>db.flush()</code> で採番されるのがこのID。</li></ul>
+<hr>
+<h2>✅ 検証ポイント</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>モデルとAPIの整合</strong>：モデルで <code>nullable=False</code>（必須）の列が、APIで必須として扱われているか。</li></ul>
+<p>ずれていると「DBは必須なのにAPIは省略可」で、保存時にエラーになる。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong><code>__tablename__</code> の一致</strong>：複数モデルが同じ表名を指していないか。</li><li class="callout c-check"><span class="tag">検証</span><strong>ForeignKey の正しさ</strong>：<code>ForeignKey(&quot;companies.id&quot;)</code> の参照先が実在する表・列か。</li></ul>
+<p>間違うと関連がたどれない。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>関連の向き</strong>：<code>back_populates</code> で双方向が一致しているか（Event.company と Company.events が対応）。</li></ul>
+<hr>
+<h2>🧭 次へ</h2>
+<p>モデル（表の設計図）が読めました。次は、その表からデータを「取ってくる」SQLの基礎。→ <code>4-3</code></p></div></body></html>

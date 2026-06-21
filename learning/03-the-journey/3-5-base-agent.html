@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>3-5 エージェントの設計図 — base.py を読む</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>3-5 エージェントの設計図 — base.py を読む</h1>
+<blockquote><p>4人のエージェントが「共通して守る約束」を定めたファイル。継承という考え方を学びます。</p><p>対象ファイル：<code>src/agents/base.py</code>（全30行）</p></blockquote>
+<hr>
+<h2>🟣 このファイルの役割</h2>
+<p>すべてのエージェントの <strong>共通の設計図（親クラス）</strong>。 「エージェントを名乗るなら、最低限これを備えていなさい」というルールブックです。</p>
+<hr>
+<h2>🔵 まず「継承」を理解する</h2>
+<p class="callout c-blue"><span class="tag">概念</span><strong>継承 (inheritance)</strong> とは、「ある設計図をベースに、それを引き継いだ別の設計図を作る」こと。</p>
+<p>たとえ話：「乗り物」という親の設計図に「走る」機能があるとします。 「車」も「バイク」もこの「乗り物」を継承すれば、わざわざ書かなくても「走る」を持てます。 そして各々が自分の個性（車はドア4枚、バイクは2輪）を足します。</p>
+<p>ASCT では：</p>
+<ul><li><strong>親</strong>：<code>BaseAgent</code>（このファイル）= 全エージェント共通のルール</li><li><strong>子</strong>：<code>DemandForecaster</code>、<code>InventoryOptimizer</code> など4人 = 個別の専門家</li></ul>
+<p>子は <code>class DemandForecaster(BaseAgent):</code> のように、カッコ内に親を書いて継承します。</p>
+<hr>
+<h2>🟢 全文を読む</h2>
+<pre><span class="lang">python</span><code>class Scenario(TypedDict):          # 🔵 「打ち手(シナリオ)」が持つべきキーの形を定義
+    name: str                       # 🟢 打ち手の名前
+    stockout_cost: float            # 🟢 欠品コスト
+    holding_cost: float             # 🟢 在庫保持コスト
+    transport_cost: float           # 🟢 輸送コスト
+    total_cost: float               # 🟢 合計コスト
+    confidence: float               # 🔴 信頼度(0〜1)
+
+
+class BaseAgent(ABC):               # 🔴 全エージェントの親。ABC=抽象クラス（そのままでは使えない設計図）
+    TRIGGERS: ClassVar[list[str]] = []   # 🔴 担当するイベント種別のリスト（子が各自で埋める）
+
+    def __init__(self, session: Session):    # 🔵 作るとき、DB窓口を受け取る
+        self.session = session               # 🔵 保管
+
+    @property
+    def name(self) -&gt; str:                   # 🟢 エージェント名（自分のクラス名を返す）
+        return self.__class__.__name__
+
+    @abstractmethod                          # 🔴 「子は必ずこれを実装せよ」という命令
+    def evaluate(self, context: dict) -&gt; list[Scenario]:   # 🔴 打ち手を出すメソッド（中身は子が書く）
+        raise NotImplementedError</code></pre>
+<hr>
+<h2>🔵 3つの重要ポイント</h2>
+<h3>① <code>Scenario</code> は「打ち手の形」の取り決め</h3>
+<p><code>class Scenario(TypedDict):</code> は、「打ち手を表す辞書は、必ずこの6つのキーを持つ」という約束です。 <code>1-3</code> で見たシナリオ辞書（<code>demand_forecaster.py</code> の <code>return {...}</code>）が、ちゃんとこの形に従っています。</p>
+<p class="callout c-red"><span class="tag">重要</span>これが効くのは <strong>CEO側</strong>。CEOは <code>scenario[&quot;total_cost&quot;]</code> のようにキーで読みます（<code>3-8</code>）。 全エージェントが同じ <code>Scenario</code> の形を守るから、CEOは「どのエージェントの打ち手も同じ方法で読める」。 <strong>共通の様式があるから、異なる専門家の提案を横並びで比較できる</strong> のです。</p>
+<h3>② <code>TRIGGERS</code> は「担当表」</h3>
+<p><code>TRIGGERS: ClassVar[list[str]] = []</code>。親では空ですが、子がそれぞれ埋めます。 <code>3-4</code> の登録係が <code>event_type in agent_class.TRIGGERS</code> で参照していた、あの担当リストです。</p>
+<h3>③ <code>@abstractmethod</code> は「実装の義務」</h3>
+<p class="callout c-red"><span class="tag">重要</span><code>evaluate</code> に <code>@abstractmethod</code> が付いています。これは 「<strong>BaseAgent を継承する子は、必ず自分で <code>evaluate</code> を書きなさい</strong>」という強制です。 書き忘れたエージェントは、そもそも作れずエラーになります。</p>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これは「品質の保証」です。 「エージェントを名乗るなら、打ち手を出す <code>evaluate</code> を必ず持て」と型で縛ることで、 中身の無いエージェントが紛れ込むのを防いでいます。<code>ABC</code>（抽象基底クラス）と <code>@abstractmethod</code> は、 そのための仕組み。<code>raise NotImplementedError</code> は「もし実装せず呼んだら、はっきりエラーにする」保険です。</p>
+<hr>
+<h2>⚪ 補足：<code>@property</code> と <code>name</code></h2>
+<p><code>@property</code> が付いた <code>name</code> は、「メソッドだけど、属性のように <code>()</code>無しで呼べる」特別な書き方。 <code>agent.name</code>（カッコ無し）で <code>&quot;DemandForecaster&quot;</code> のような名前が返ります。 今は「クラス名を返す便利機能」とだけ覚えてOK。</p>
+<hr>
+<h2>✅ 検証ポイント</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>子が <code>evaluate</code> を実装しているか</strong>：<code>@abstractmethod</code> のメソッドを子が書き忘れると、</li></ul>
+<p>そのエージェントはインスタンス化できずエラー。AIが新エージェントを書いたら、まず <code>evaluate</code> の有無を確認。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>返り値が <code>Scenario</code> の形に従っているか</strong>：子の <code>evaluate</code> が返す辞書が、6キーを満たしているか。</li></ul>
+<p>キーが欠けると、CEO側で <code>scenario[&quot;holding_cost&quot;]</code> がエラーになる（連鎖バグ）。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong><code>TRIGGERS</code> が設定されているか</strong>：空のままだと、そのエージェントはどのイベントでも選ばれない（出動しない）。</li></ul>
+<hr>
+<h2>🧭 次へ</h2>
+<p>いよいよ具体的な専門家。需要予測エージェントが、どうやって打ち手を計算するのか。→ <code>3-6</code></p></div></body></html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>2-1 アーキテクチャ俯瞰図 — ASCT 全体は何をしているか</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>2-1 アーキテクチャ俯瞰図 — ASCT 全体は何をしているか</h1>
+<blockquote><p>このレッスンのゴール：個別のファイルを読む前に、「ASCT 全体が何を、どういう順でやるか」を</p><p>頭の中に地図として持つ。本編（03章）はこの地図を1区間ずつ歩く旅です。</p></blockquote>
+<hr>
+<h2>🟣 ASCT を一言でいうと</h2>
+<blockquote><p>**「サプライチェーンに異変（イベント）が起きたとき、複数のAI担当者が打ち手を出し合い、</p><p>CEO役がそれを見比べて、自動で決める。決めきれなければ人間に回す」エンジン。**</p></blockquote>
+<p>あなたが企画したこのプロダクトの核心は、「<strong>人間の意思決定を、説明可能な形で自動化する</strong>」ことです。</p>
+<hr>
+<h2>🔴 一番大事な流れ（これだけは覚える）</h2>
+<pre><code>   ① イベント発生
+        │   例：「フレッシュ野菜の需要が急増した」
+        ▼
+   ② 窓口が受け取る（API）
+        │   src/api/routes_events.py
+        ▼
+   ③ 司令塔が段取りする（RunComposer）
+        │   src/orchestrator/run_composer.py
+        ▼
+   ④ 担当エージェントを選ぶ（PluginRegistry）
+        │   src/agents/__init__.py
+        │   「需要急増」なら需要予測担当が呼ばれる
+        ▼
+   ⑤ 各エージェントが打ち手（シナリオ）を出す
+        │   src/agents/demand_forecaster.py など
+        │   「この案ならコストはこれくらい、信頼度はこれくらい」
+        ▼
+   ⑥ CEOが見比べて最終判断（CEOOrchestrator）
+        │   src/orchestrator/ceo.py
+        │   制約チェック → 点数づけ → 1つ選ぶ
+        ▼
+   ⑦ 結果をデータベースに保存
+        │   決定(CEODecision) または 人間へ委ねる(EscalationRecord)
+        ▼
+   ⑧ 窓口が結果を返す</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>この①〜⑧が ASCT の背骨です。</strong> 本編03章は、まさにこの順番でファイルを1つずつ読みます。 各レッスンの番号と、上の番号がだいたい対応しています。</p>
+<hr>
+<h2>🔵 登場人物（モジュール）の役割early表</h2>
+<table><thead><tr><th>登場人物</th><th>ファイル</th><th>役割</th><th>人間にたとえると</th></tr></thead><tbody><tr><td><strong>API窓口</strong></td><td><code>api/routes_events.py</code></td><td>外部からイベントを受け付ける</td><td>受付係</td></tr><tr><td><strong>司令塔</strong></td><td><code>orchestrator/run_composer.py</code></td><td>全体の段取りをする</td><td>進行役・指揮者</td></tr><tr><td><strong>登録係</strong></td><td><code>agents/__init__.py</code></td><td>イベントに合うエージェントを選ぶ</td><td>人事・配置係</td></tr><tr><td><strong>エージェント</strong></td><td><code>agents/*.py</code>（4種類）</td><td>専門分野の打ち手を出す</td><td>各部門の専門家</td></tr><tr><td><strong>CEO</strong></td><td><code>orchestrator/ceo.py</code></td><td>打ち手を見比べ、最終決定する</td><td>社長</td></tr><tr><td><strong>エスカレーション</strong></td><td><code>orchestrator/escalation.py</code></td><td>決めきれないとき人間に回す</td><td>「これは社長でも決められません」</td></tr><tr><td><strong>信頼度計算</strong></td><td><code>orchestrator/confidence.py</code></td><td>各判断の自信度を数値化</td><td>「この見立ての確からしさ」</td></tr><tr><td><strong>モデル群</strong></td><td><code>models/*.py</code></td><td>データの形を定義（DB）</td><td>書類のフォーマット</td></tr><tr><td><strong>設定</strong></td><td><code>configs/*.yaml</code></td><td>会社ごとの判断基準</td><td>社内規定</td></tr></tbody></table>
+<hr>
+<h2>🔵 4種類のエージェント（専門家たち）</h2>
+<p>ASCT には4人の専門家がいます。それぞれ担当するイベントが違います。</p>
+<table><thead><tr><th>エージェント</th><th>担当</th><th>反応するイベント (TRIGGERS)</th></tr></thead><tbody><tr><td><code>DemandForecaster</code></td><td>需要予測</td><td>需要急増・季節変動</td></tr><tr><td><code>InventoryOptimizer</code></td><td>在庫最適化</td><td>在庫アラート・発注トリガー</td></tr><tr><td><code>LogisticsPlanner</code></td><td>物流計画</td><td>輸送路遮断・天候</td></tr><tr><td><code>SupplyRiskAssessor</code></td><td>供給リスク</td><td>供給途絶</td></tr></tbody></table>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：「需要が急増した」というイベントには需要予測担当が、 「輸送路が遮断された」には物流担当が反応します。 <strong>イベントの種類によって、出動する専門家が自動で変わる</strong> のがミソです。 この「自動で選ぶ」仕組みが <code>3-4</code>（PluginRegistry）の見どころです。</p>
+<hr>
+<h2>🔵 2つの結末：決定 か エスカレーション か</h2>
+<p>CEOの判断は、必ずどちらかに着地します。</p>
+<pre><code>              ┌─→ ✅ CEODecision（決定）
+   CEOが判断 ─┤      自信を持って1つの打ち手を選べた
+              └─→ ⚠️ EscalationRecord（エスカレーション）
+                     決めきれない。人間に委ねる</code></pre>
+<p><strong>エスカレーションになる3つのケース</strong>（<code>ceo.py</code> で読みます）：</p>
+<ol><li>緊急なのに、どの案も信頼度が低すぎる（<code>low_confidence</code>）</li><li>制約（予算・輸送費上限など）を満たす案が1つも無い（<code>no_viable_action</code>）</li><li>上位2案の点差が小さすぎて甲乙つけがたい（<code>ambiguous_recommendation</code>）</li></ol>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：これは「AIが暴走しない」ための安全装置です。 自信がないのに勝手に決めさせず、人間に判断を返す。あなたの企画思想そのものです。</p>
+<hr>
+<h2>⚪ 補足：今は無視してよい登場人物</h2>
+<p>ASCT には他にも <code>dashboard.py</code>（画面表示）、<code>config/nl_parser.py</code>（日本語→設定変換）、 <code>seed/generate.py</code>（練習データ生成）などがあります。 これらは <strong>背骨①〜⑧には含まれない脇役</strong> です。背骨を理解してから、余裕があれば覗きましょう。</p>
+<hr>
+<h2>✅ このレッスンの確認</h2>
+<p>地図を閉じて、次の問いに自分の言葉で答えてみてください（Claudeに採点を頼んでOK）：</p>
+<ol><li>「需要急増」イベントが来てから、結果がDBに保存されるまで、登場人物は何人？どんな順？</li><li>CEOの判断が「決定」ではなく「エスカレーション」になるのは、どんなとき？</li></ol>
+<p>答えられたら、地図は頭に入っています。本編 <code>03-the-journey/3-1</code> へ進みましょう。</p></div></body></html>

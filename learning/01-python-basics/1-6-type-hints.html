@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>1-6 型ヒント — 「この箱には何が入る」という注釈</title><style>
+:root { color-scheme: light dark; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif;
+  line-height: 1.9; color: #1f2328; background: #f6f7f9;
+  margin: 0; padding: 2rem 1rem; -webkit-text-size-adjust: 100%;
+}
+.wrap { max-width: 820px; margin: 0 auto; background: #fff;
+  padding: 2.4rem 2.6rem; border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.05); }
+h1 { font-size: 1.7rem; line-height: 1.4; margin: .2em 0 .8em;
+  padding-bottom: .4em; border-bottom: 3px solid #2563eb; }
+h2 { font-size: 1.35rem; margin: 1.8em 0 .6em; padding-left: .5em;
+  border-left: 6px solid #2563eb; }
+h3 { font-size: 1.12rem; margin: 1.4em 0 .5em; color: #0f3b8c; }
+p { margin: .7em 0; }
+a { color: #2563eb; }
+hr { border: 0; border-top: 1px dashed #cbd5e1; margin: 1.8em 0; }
+code { font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+  background: #eef1f5; padding: .12em .4em; border-radius: 5px; font-size: .92em; }
+pre { background: #0f172a; color: #e2e8f0; padding: 1rem 1.1rem; border-radius: 10px;
+  overflow-x: auto; line-height: 1.65; font-size: .9rem; }
+pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre .lang { display: block; font-size: .72rem; letter-spacing: .08em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .5rem; }
+blockquote { margin: 1em 0; padding: .6em 1.1em; color: #475569;
+  background: #f1f5f9; border-left: 5px solid #94a3b8; border-radius: 0 8px 8px 0; }
+blockquote p { margin: .3em 0; }
+table { border-collapse: collapse; width: 100%; margin: 1.1em 0; font-size: .94rem; }
+th, td { border: 1px solid #d8dee4; padding: .55em .8em; text-align: left; vertical-align: top; }
+th { background: #eef2ff; }
+ul, ol { margin: .6em 0; padding-left: 1.5em; }
+li { margin: .3em 0; }
+strong { color: #b91c1c; }
+
+/* 色マークの囲みボックス */
+.callout { margin: .7em 0; padding: .7em 1em .7em 1em; border-radius: 0 8px 8px 0;
+  border-left: 6px solid; position: relative; }
+.callout .tag { display: inline-block; font-size: .72rem; font-weight: 700;
+  padding: .05em .55em; border-radius: 999px; margin-right: .5em; vertical-align: .12em; color:#fff; }
+.callout ul, .callout ol { margin: .3em 0; }
+.c-blue   { background:#eff6ff; border-color:#3b82f6; }  .c-blue .tag{background:#3b82f6;}
+.c-green  { background:#ecfdf5; border-color:#10b981; }  .c-green .tag{background:#10b981;}
+.c-yellow { background:#fffbeb; border-color:#f59e0b; }  .c-yellow .tag{background:#d97706;}
+.c-red    { background:#fef2f2; border-color:#ef4444; }  .c-red .tag{background:#ef4444;}
+.c-purple { background:#faf5ff; border-color:#a855f7; }  .c-purple .tag{background:#a855f7;}
+.c-check  { background:#f0fdf4; border-color:#22c55e; }  .c-check .tag{background:#16a34a;}
+.c-gray   { background:#f8fafc; border-color:#94a3b8; }  .c-gray .tag{background:#64748b;}
+.c-brain  { background:#fdf4ff; border-color:#c026d3; }  .c-brain .tag{background:#c026d3;}
+.c-grad   { background:#fffbeb; border-color:#eab308; }  .c-grad .tag{background:#ca8a04;}
+.legend { display:flex; flex-wrap:wrap; gap:.4em; margin:.4em 0 1.4em; font-size:.78rem; }
+.legend span { padding:.15em .6em; border-radius:999px; color:#fff; }
+.nav { font-size:.85rem; color:#64748b; margin-bottom:1.4em; }
+@media (prefers-color-scheme: dark) {
+  body { background:#0b1020; color:#e5e7eb; }
+  .wrap { background:#121829; box-shadow:none; }
+  h3 { color:#93c5fd; } code { background:#1e293b; color:#e2e8f0; }
+  th { background:#1e293b; } td, th { border-color:#334155; }
+  blockquote { background:#1a2132; color:#cbd5e1; }
+  strong { color:#fca5a5; }
+  .c-blue{background:#13203a;}.c-green{background:#0c2a22;}.c-yellow{background:#2a2410;}
+  .c-red{background:#2a1518;}.c-purple{background:#241433;}.c-check{background:#0c2a1a;}
+  .c-gray{background:#1a2132;}.c-brain{background:#26122b;}.c-grad{background:#2a2410;}
+}
+</style></head><body><div class="wrap"><div class="nav">ASCT 学習教材 — このファイルはMarkdownから自動生成されています</div><div class="legend"><span style="background:#3b82f6">🔵 概念</span><span style="background:#10b981">🟢 コード</span><span style="background:#d97706">🟡 注意</span><span style="background:#ef4444">🔴 重要</span><span style="background:#a855f7">🟣 実務</span><span style="background:#16a34a">✅ 検証</span><span style="background:#64748b">⚪ 補足</span></div><h1>1-6 型ヒント — 「この箱には何が入る」という注釈</h1>
+<blockquote><p>このレッスンのゴール：<code>name: str</code> や <code>-&gt; dict</code> のような「コロンと矢印の注釈」が読めるようになる。</p><p>ASCT は型ヒントを多用しています。これが読めると、コードが「自己説明」してくれます。</p></blockquote>
+<hr>
+<h2>🔵 型ヒントとは</h2>
+<p><strong>型ヒント</strong> は、「この変数・引数・返り値には、この種類の値が入りますよ」という <strong>注釈</strong> です。 書いても書かなくてもプログラムは動きますが、書いてあると <strong>読む人に親切</strong> で、間違いも見つけやすくなります。</p>
+<pre><span class="lang">python</span><code>price: int = 100              # 🔵 price には int（整数）が入る、という注釈
+name: str = &quot;りんご&quot;          # 🔵 name には str（文字列）が入る</code></pre>
+<p class="callout c-red"><span class="tag">重要</span><strong>読み方</strong>：<code>変数名 : 型</code> の <strong>コロンの後ろ</strong> が型です。「price は int 型」と読みます。</p>
+<hr>
+<h2>🔵 関数の型ヒント — 入口と出口に注釈</h2>
+<pre><span class="lang">python</span><code>def add_tax(price: float) -&gt; float:   # 🔵 floatを受け取り、floatを返す関数、という宣言
+    return price * 1.1</code></pre>
+<ul><li><code>price: float</code> … <strong>引数</strong> の型（入口）。「floatを受け取る」</li><li><code>-&gt; float</code> … <strong>返り値</strong> の型（出口）。矢印の後ろが「返すもの」。「floatを返す」</li></ul>
+<p class="callout c-red"><span class="tag">重要</span>これが読めると、関数の中身を読まなくても <strong>「何を入れて、何が出てくるか」</strong> が分かります。 忙しいときは、まず型ヒントだけ見て当たりをつけられます。</p>
+<hr>
+<h2>🔵 よく出る型の一覧</h2>
+<table><thead><tr><th>書き方</th><th>意味</th></tr></thead><tbody><tr><td><code>int</code> / <code>float</code> / <code>str</code> / <code>bool</code></td><td>整数 / 小数 / 文字列 / 真偽値</td></tr><tr><td><code>dict</code></td><td>辞書（<code>{...}</code>）</td></tr><tr><td><code>list</code></td><td>リスト（<code>[...]</code>）</td></tr><tr><td><code>list[dict]</code></td><td>「辞書を並べたリスト」</td></tr><tr><td><code>list[str]</code></td><td>「文字列を並べたリスト」</td></tr><tr><td>`int \</td><td>None`</td><td>「整数、または何も無い(None)」のどちらか</td></tr><tr><td>`CEODecision \</td><td>EscalationRecord`</td><td>「CEO決定、またはエスカレーション記録」のどちらか</td></tr></tbody></table>
+<p class="callout c-yellow"><span class="tag">注意</span><strong><code>None</code>（ノン）とは</strong>：「値が無い」を表す特別な値。<code>int | None</code> は 「整数が入ることもあれば、空っぽのこともある」という意味。<code>|</code> は「または」。</p>
+<hr>
+<h2>🟢 ASCT の本物のコードで見る</h2>
+<p><code>src/orchestrator/ceo.py</code> の13〜15行目。CEOが最終判断を返すメソッドの宣言です：</p>
+<pre><span class="lang">python</span><code>def resolve(
+    self, scenarios: list[dict], event: Event, config: dict   # 🔵 入口：辞書のリスト・イベント・設定
+) -&gt; CEODecision | EscalationRecord:                          # 🔴 出口：CEO決定 か エスカレーション のどちらか</code></pre>
+<p><strong>中身を1行も読まずに分かること</strong>：</p>
+<ul><li>入力は「シナリオのリスト（<code>list[dict]</code>）」「イベント（<code>Event</code>）」「設定（<code>dict</code>）」の3つ。</li><li>出力は「<code>CEODecision</code>（決定）」<strong>または</strong>「<code>EscalationRecord</code>（人間に委ねる記録）」。</li></ul>
+<p class="callout c-purple"><span class="tag">実務</span><strong>実務での意味</strong>：この型ヒントだけで、ASCT の心臓部の設計思想が読めます。 「CEOは、シナリオを見比べて、<strong>自分で決める（CEODecision）か、人間にエスカレする（EscalationRecord）か</strong>、 どちらかを返す」。あなたが企画した「AIが決めきれないときは人間に委ねる」という思想が、 <code>-&gt; CEODecision | EscalationRecord</code> という1行の出口宣言に表れています。</p>
+<hr>
+<h2>⚪ 補足：<code>ClassVar</code> や <code>Mapped</code> など見慣れない型</h2>
+<p>ASCT には <code>Mapped[int]</code>（4章で説明）や <code>ClassVar[list[str]]</code> も出てきます。 これらは「特殊な文脈での型ヒント」です。今は <strong><code>[ ]</code> の中が本体の型</strong> とだけ押さえてください。 <code>Mapped[int]</code> なら「中身は int」、<code>list[str]</code> なら「中身は文字列のリスト」。</p>
+<hr>
+<h2>✅ 検証ポイント（AIコードを読むとき）</h2>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>宣言と実態が合っているか</strong>：<code>-&gt; dict</code> と書いてあるのに、<code>return 5</code>（数字）していたら矛盾＝バグの疑い。</li><li class="callout c-check"><span class="tag">検証</span><strong><code>None</code> の可能性を見落としていないか</strong>：<code>int | None</code> を返す関数の結果を、</li></ul>
+<p>そのまま計算に使うとエラーになりうる（<code>None + 1</code> は不可）。AIが <code>None</code> チェックを忘れる典型バグ。</p>
+<ul><li class="callout c-check"><span class="tag">検証</span><strong>型ヒントを「設計の意図」として読む</strong>：<code>CEODecision | EscalationRecord</code> のような</li></ul>
+<p>「どちらか」の型は、その関数の役割そのものを語っている。</p>
+<hr>
+<h2>🧠 理解チェック</h2>
+<p>次の関数宣言を読んで、「何を受け取り、何を返すか」を言葉で説明してみてください：</p>
+<pre><span class="lang">python</span><code>def calculate_confidence(base: float, data_age_hours: float, source: str, ...) -&gt; float:</code></pre>
+<p>（答え：基準値・データの古さ(時間)・情報源(文字列)などを受け取り、信頼度(float)を1つ返す。 <code>src/orchestrator/confidence.py</code> の本物の関数です。本編 <code>3-7</code> で中身を読みます）</p></div></body></html>
