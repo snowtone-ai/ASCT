@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /**
  * .claude/hooks/dispatcher.mjs -- Claude Code unified hook handler
- * pm-zero v9.2
+ * pm-zero v10
+ *
+ * SessionStart: surface state/decisions. PostToolUseFailure: log to issues.md
+ * (feeds Self-Evolution). The deny-set guard lives in guard.mjs (PreToolUse).
  */
 import { readFile, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
