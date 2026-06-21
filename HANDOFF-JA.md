@@ -1,47 +1,36 @@
-# HANDOFF-JA.md
+# 完了・エラー報告 (HANDOFF-JA)
 
-## Completion Report Template
+## 概要
+- 実施内容:
+- 結果: 完了 / 部分完了 / 要対応
 
-### What was done
-- [content]
+## 変更ファイル
+-
 
-### Changed files
-- [path]
+## 完了タスク
+- タスクID:
+- tasks.md 更新: 済 / 未
+- 残ready / blocked タスク:
 
-### Verification
-- Mode: quick / standard / final
-- Commands:
-  - [command]
-- Results:
-  - [result]
+## 検証エビデンス
+- タスクID:
+- コマンド:
+- 結果:
+- エビデンス保存先:
+- 未検証項目:
 
-### Design decisions
-- docs/decisions.md: [item]
+## 自己レビュー
+- レビューモデル:
+- 結果: 合格 / 指摘あり
+- 指摘と対応:
 
-### Current state
-- docs/state.md updated: yes / no
-- git status: clean / dirty
+## 自己進化 (該当時)
+- docs/issues.md 記録: 済 / 未
+- Web検索による解決: あり (出典URL) / なし
+- CLAUDE.md / docs/lessons.md へ昇格したルール:
 
-### Human actions needed
-- [Only operations AI cannot perform]
+## 人間対応が必要な事項 (不可逆な現実操作のみ)
+- 実費の発生 / 本番クレデンシャル / 個人情報の公開 など:
 
-### Remaining tasks
-- None / [content]
-
----
-
-## Error Report Template
-
-### What is happening
-- [one line]
-
-### Category
-- [dependency / type / lint / runtime / UI / API / auth / security / observability]
-
-### Attempt history
-1. [attempt] -> [result]
-2. [attempt] -> [result]
-3. [attempt] -> [result]
-
-### Human actions needed
-- [Only operations AI cannot perform]
+## 残存リスク
+-

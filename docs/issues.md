@@ -1,9 +1,17 @@
-# issues.md
+# issues.md -- Failure Log and Self-Evolution
 
-## Error Log
+## Active Issues
+| ID | Symptom | Context | Attempts | Status |
+|---|---|---|---|---|
+| - | - | - | - | - |
 
-(No errors recorded yet)
+## Resolved (with root cause)
+| ID | Root cause | Fix | Source URL | Promoted to |
+|---|---|---|---|---|
+| - | - | - | - | - |
 
-## Escalation
+## Promoted Rules
+- (One line per durable rule moved into CLAUDE.md or docs/lessons.md)
 
-(No escalations)
+## Hook-captured Failures
+<!-- PostToolUseFailure hook appends entries below this line. -->
