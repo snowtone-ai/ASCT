@@ -1,6 +1,6 @@
 /**
  * scripts/lib/redact.mjs -- Single source for secret redaction
- * Used by both Claude and Codex dispatchers.
+ * Used by the Claude Code hook scripts (dispatcher.mjs, guard.mjs).
  */
 
 const REDACT_PATTERNS = [

@@ -7,7 +7,6 @@ const dirs = [
   'scripts/lib',
   '.claude/hooks',
   '.claude/skills',
-  '.codex/hooks',
   'screenshots',
   'logs',
   // ASCT project structure
@@ -31,4 +30,4 @@ for (const dir of dirs) {
   console.log(`created: ${dir}`);
 }
 
-console.log('pm-zero v9.2 + ASCT directory structure ready.');
+console.log('pm-zero v10 + ASCT directory structure ready.');
