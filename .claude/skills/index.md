@@ -1,4 +1,4 @@
-# pm-zero v9.2 Skill Index -- ASCT
+# pm-zero v10 Skill Index -- ASCT
 
 ## Skill Loading
 Read only the section needed. Each skill is self-contained.
@@ -7,7 +7,8 @@ Read only the section needed. Each skill is self-contained.
 Read state / decisions / issues. Identify restart point. Report current status.
 
 ## S2 /escape
-Organize 3x-failed task into Escalation format. Prepare handoff for alternate model.
+On 3x failure: web-search a known fix and record the source URL in docs/issues.md (Self-Evolution).
+If still unresolved, summarize in HANDOFF-JA.md and surface to the human.
 
 ## S3 /audit
 Verify pm-zero knowledge / repo rules / official docs are current. Report staleness.
@@ -16,7 +17,9 @@ Verify pm-zero knowledge / repo rules / official docs are current. Report stalen
 Find 3 real-world examples. Record in docs/decisions.md with adopted/avoided elements.
 
 ## S5 /ev
-Classify post-completion lessons into: Project-specific / Pattern / OS Design / Vendor Adapter.
+Self-Evolution: classify post-completion lessons into: Project-specific (stays in docs/issues.md) /
+Always-applicable rule (one line in CLAUDE.md) / Reference-level lesson (docs/lessons.md) /
+OS design issue (v10.x candidate, note in docs/decisions.md).
 
 ## S6 /env-guide
 Decompose API key / OAuth / deploy setup into human-executable steps only.
