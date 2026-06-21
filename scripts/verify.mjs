@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/verify.mjs -- pm-zero v9.2 unified verification entry point
+ * scripts/verify.mjs -- pm-zero v10 unified verification entry point
  * Adapted for Python/FastAPI (ASCT project)
  */
 import { spawn } from 'node:child_process';
@@ -40,9 +40,17 @@ async function main() {
     if (!exists) results.push({ label: `dir:${dir}`, code: 1, pass: false });
   }
 
-  // 2. Adapter integrity check
-  const adapterFiles = ['.claude/settings.json', '.codex/config.toml', 'AGENTS.md', 'CLAUDE.md'];
-  for (const f of adapterFiles) {
+  // 2. v10 core/ledger integrity check
+  const coreFiles = [
+    'CLAUDE.md',
+    '.claude/settings.json',
+    '.claude/hooks/guard.mjs',
+    'tasks.md',
+    'docs/state.md',
+    'docs/repo-map.md',
+    'HANDOFF-JA.md',
+  ];
+  for (const f of coreFiles) {
     const exists = existsSync(f);
     console.log(`  ${exists ? 'OK' : 'MISSING'}: ${f}`);
     if (!exists) results.push({ label: `file:${f}`, code: 1, pass: false });
