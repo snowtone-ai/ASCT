@@ -50,3 +50,4 @@ screenshots/*.png
 
 # Alembic
 alembic/versions/__pycache__/
+.codegraph/
